@@ -320,7 +320,6 @@ function TetrisMoves.rotate(Block)
     end
     
     if Block.typus == 5 then -- Z Block
-        Block.rotation = Block.rotation % 2
         
         if Block.rotation == 0 then
             Block.a.x = Block.a.x +1
@@ -369,7 +368,6 @@ function TetrisMoves.rotate(Block)
     end
     
     if Block.typus == 6 then -- S Block
-        Block.rotation = Block.rotation % 2
         
         if Block.rotation == 0 then
             Block.a.x = Block.a.x +1
