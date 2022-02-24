@@ -73,7 +73,7 @@ local function _execManipulation(manipulation)
 
     -- unset old position
     _setBlockToArray(Tetris.blocks.none)
-    
+
     if manipulation == Tetris.manipulations.left then
         Tetris.Block = TetrisMoves.left(Tetris.Block)
     elseif manipulation == Tetris.manipulations.right then
@@ -109,7 +109,7 @@ local function _execManipulation(manipulation)
         _setBlockToArray(Tetris.Block.typus)
         return false
     end
-    
+
      --check if pixels are free
     if Tetris.array[Tetris.Block.a.x][Tetris.Block.a.y] ~= Tetris.blocks.none or Tetris.array[Tetris.Block.b.x][Tetris.Block.b.y] ~= Tetris.blocks.none or
        Tetris.array[Tetris.Block.c.x][Tetris.Block.c.y] ~= Tetris.blocks.none or Tetris.array[Tetris.Block.d.x][Tetris.Block.d.y] ~= Tetris.blocks.none then
@@ -183,7 +183,7 @@ end
 local function _createBlock()
     typus = math.random(Tetris.blocks.j, Tetris.blocks.o)
     Tetris.Block = TetrisMoves.start(typus)
-        
+
     if not _checkMoves() then
         EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
         for i=0,width-1 do
@@ -195,16 +195,16 @@ local function _createBlock()
     else
         _setBlockToArray(typus)
     end
-    
+
     _drawUI()
 end
 
 
-local function _manipulate(manipulation)    
+local function _manipulate(manipulation)
     result = true
     -- rule: allow only max Manipulations
     if manipulation == Tetris.manipulations.slam then
-    
+
         while _checkMoves() and result do
             EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
             result = _execManipulation(Tetris.manipulations.down)
@@ -225,13 +225,13 @@ local function _manipulate(manipulation)
     end
 
     _drawUI()
-    
+
     return result
 end
 
 local function _removeLines()
     rm = 0
-    
+
     --bottom up
     for j=height-1,0,-1 do
         line = 0
@@ -240,7 +240,7 @@ local function _removeLines()
             if Tetris.array[i][j] ~= Tetris.blocks.none then
                 line = line + 1
             end
-            
+
             -- move line down rm steps
             for r=0,rm-1 do
                 --line under j becomes line j+1
@@ -265,7 +265,7 @@ end
 function Tetris.tick()
     --unset timer
     EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
-    
+
     if not _manipulate(Tetris.manipulations.down) then
         _removeLines()
         _createBlock()
@@ -273,7 +273,7 @@ function Tetris.tick()
 
     --reset maxManipulations
     maxManipulations = { left = 5, right = 5, rotate = 4 }
-    
+
     --set timer
     EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "tick", timeout, Tetris.tick)
 end
@@ -308,7 +308,7 @@ local function _createUI()
     Tetris.UI:SetDrawLevel(0)
     Tetris.UI:SetDrawLayer(DL_MAX_VALUE-1)
     Tetris.UI:SetDrawTier(DT_MAX_VALUE-1)
-    
+
     Tetris.UI.background = WINDOW_MANAGER:CreateControl(nil, Tetris.UI, CT_TEXTURE)
     Tetris.UI.background:SetDimensions(dimX, dimY)
     Tetris.UI.background:SetColor(0, 0, 0, 1)
@@ -317,7 +317,7 @@ local function _createUI()
     Tetris.UI.background:SetDrawLevel(0)
 
     Tetris.UI.pixel = {}
-    
+
     for i=0,width-1 do
         Tetris.UI.pixel[i] = {}
         Tetris.array[i] = {}
@@ -346,8 +346,8 @@ function Tetris.OnAddOnLoaded(event, addonName)
         ZO_CreateStringId("SI_BINDING_NAME_TETRISRIGHT", "Move Right")
         ZO_CreateStringId("SI_BINDING_NAME_TETRISROTATE", "Rotate")
         ZO_CreateStringId("SI_BINDING_NAME_TETRISSLAM", "Slam")
-        
-        
+
+
         _createUI()
         _createBlock()
         _drawUI()
