@@ -157,13 +157,11 @@ end
 local function _checkMoves()
     if Tetris.Block.a.y >= Tetris.Block.b.y and Tetris.Block.a.y >= Tetris.Block.c.y and Tetris.Block.a.y >= Tetris.Block.d.y then
         if Tetris.array[Tetris.Block.a.x][Tetris.Block.a.y+1] ~= Tetris.blocks.none then
-            logger:Warn("SCHEISSE A")
             return false
         end
     end
     if Tetris.Block.b.y >= Tetris.Block.a.y and Tetris.Block.b.y >= Tetris.Block.c.y and Tetris.Block.b.y >= Tetris.Block.d.y then
         if Tetris.array[Tetris.Block.b.x][Tetris.Block.b.y+1] ~= Tetris.blocks.none then
-            logger:Warn("SCHEISSE B")
             return false
         end
     end
@@ -175,7 +173,6 @@ local function _checkMoves()
     end
     if Tetris.Block.d.y >= Tetris.Block.a.y and Tetris.Block.d.y >= Tetris.Block.b.y and Tetris.Block.d.y >= Tetris.Block.c.y then
         if Tetris.array[Tetris.Block.d.x][Tetris.Block.d.y+1] ~= Tetris.blocks.none then
-            logger:Warn("SCHEISSE D")
             return false
         end
     end
@@ -184,13 +181,11 @@ end
 
 
 local function _createBlock()
-    logger:Warn("_createBlock")
     typus = math.random(Tetris.blocks.j, Tetris.blocks.o)
     Tetris.Block = TetrisMoves.start(typus)
         
     if not _checkMoves() then
         EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
-        logger:Warn("Game Over")
         for i=0,width-1 do
             for j=0,height-1 do
                 Tetris.array[i][j] = Tetris.blocks.none
@@ -247,7 +242,6 @@ local function _removeLines()
             end
             
             -- move line down rm steps
-            logger:Warn("r", j, r, rm)
             for r=0,rm-1 do
                 --line under j becomes line j+1
                 Tetris.array[i][j+1+r] = Tetris.array[i][j+r]
