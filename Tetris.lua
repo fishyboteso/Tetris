@@ -333,6 +333,23 @@ local function _createUI()
 end
 
 
+function Tetris.toggle(fishingState)
+    if fishingState == FishyCha.state.looking or fishingState == FishyCha.state.fishing or fishingState == FishyCha.state.reelin then
+        if Tetris.running == false then
+            EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "tick", timeout, Tetris.tick)
+            --Tetris.UI:SetHidden(false)
+            Tetris.running = true
+        end
+    else
+        if Tetris.running == true then
+            EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
+            --Tetris.UI:SetHidden(true)
+            Tetris.running = false
+        end
+    end
+end
+
+
 function Tetris.OnAddOnLoaded(event, addonName)
     if addonName == Tetris.name then
         -- init once and never come here again
@@ -351,7 +368,9 @@ function Tetris.OnAddOnLoaded(event, addonName)
         _createBlock()
         _drawUI()
 
-        EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "tick", timeout, Tetris.tick)
+        Tetris.running = false
+
+        FishyCha.CallbackManager:RegisterCallback(FishyCha.name .. "FishyCha_STATE_CHANGE", Tetris.toggle)
     end
 end
 
