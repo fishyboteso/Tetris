@@ -159,19 +159,18 @@ local function _checkMoves()
         if Tetris.array[Tetris.Block.a.x][Tetris.Block.a.y+1] ~= Tetris.blocks.none then
             return false
         end
-    end
-    if Tetris.Block.b.y >= Tetris.Block.a.y and Tetris.Block.b.y >= Tetris.Block.c.y and Tetris.Block.b.y >= Tetris.Block.d.y then
+
+    elseif Tetris.Block.b.y >= Tetris.Block.a.y and Tetris.Block.b.y >= Tetris.Block.c.y and Tetris.Block.b.y >= Tetris.Block.d.y then
         if Tetris.array[Tetris.Block.b.x][Tetris.Block.b.y+1] ~= Tetris.blocks.none then
             return false
         end
-    end
-    if Tetris.Block.c.y >= Tetris.Block.a.y and Tetris.Block.c.y >= Tetris.Block.b.y and Tetris.Block.c.y >= Tetris.Block.d.y then
-        if Tetris.array[Tetris.Block.c.x][Tetris.Block.c.y+1 ~= Tetris.blocks.none] then
-            logger:Warn("SCHEISSE C")
+
+    elseif Tetris.Block.c.y >= Tetris.Block.a.y and Tetris.Block.c.y >= Tetris.Block.b.y and Tetris.Block.c.y >= Tetris.Block.d.y then
+        if Tetris.array[Tetris.Block.c.x][Tetris.Block.c.y+1] ~= Tetris.blocks.none then
             return false
         end
-    end
-    if Tetris.Block.d.y >= Tetris.Block.a.y and Tetris.Block.d.y >= Tetris.Block.b.y and Tetris.Block.d.y >= Tetris.Block.c.y then
+
+    elseif Tetris.Block.d.y >= Tetris.Block.a.y and Tetris.Block.d.y >= Tetris.Block.b.y and Tetris.Block.d.y >= Tetris.Block.c.y then
         if Tetris.array[Tetris.Block.d.x][Tetris.Block.d.y+1] ~= Tetris.blocks.none then
             return false
         end
