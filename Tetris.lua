@@ -210,12 +210,16 @@ end
 
 
 local function _manipulate(manipulation)
+    if Tetris.running == false then
+        return false
+    end
+
     result = true
     -- rule: allow only max Manipulations
     if manipulation == Tetris.manipulations.slam then
+        EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
 
         while _checkMoves() and result do
-            EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
             result = _execManipulation(Tetris.manipulations.down)
         end
 
@@ -284,7 +288,9 @@ function Tetris.tick()
     maxManipulations = { left = 5, right = 5, rotate = 4 }
 
     --set timer
-    EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "tick", timeout, Tetris.tick)
+    if Tetris.running == true then
+        EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "tick", timeout, Tetris.tick)
+    end
 end
 
 
