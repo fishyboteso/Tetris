@@ -147,6 +147,7 @@ local function _drawUI()
             elseif Tetris.array[i][j] == Tetris.blocks.none then
                 Tetris.UI.pixel[i][j]:SetColor(1, 1, 1, 1) --white
             end
+            Tetris.UI.background:SetColor(0,0,0,1)
         end
     end
 end
@@ -377,21 +378,31 @@ local function _createUI()
             Tetris.UI.pixel[i][j]:SetDrawLevel(0)
         end
     end
+
+    Tetris.fragment = ZO_FadeSceneFragment:New(Tetris.UI, 100, 1000)
+    Tetris.UI:SetHidden(true)
 end
 
 
 function Tetris.toggle(fishingState)
     if fishingState == FishyCha.state.looking or fishingState == FishyCha.state.fishing or fishingState == FishyCha.state.reelin then
         if Tetris.running == false then
-            EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "tick", timeout, Tetris.tick)
-            --Tetris.UI:SetHidden(false)
+            HUD_SCENE:AddFragment(Tetris.fragment)
+            LOOT_SCENE:AddFragment(Tetris.fragment)
             Tetris.running = true
+            EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "tick", timeout, Tetris.tick)
+        end
+    elseif fishingState == FishyCha.state.loot then
+        if Tetris.running == true then
+            EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
+            Tetris.running = false
         end
     else
         if Tetris.running == true then
             EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
-            --Tetris.UI:SetHidden(true)
             Tetris.running = false
+            HUD_SCENE:RemoveFragment(Tetris.fragment)
+            LOOT_SCENE:RemoveFragment(Tetris.fragment)
         end
     end
 end
@@ -409,7 +420,6 @@ function Tetris.OnAddOnLoaded(event, addonName)
         ZO_CreateStringId("SI_BINDING_NAME_TETRISRIGHT", "Move Right")
         ZO_CreateStringId("SI_BINDING_NAME_TETRISROTATE", "Rotate")
         ZO_CreateStringId("SI_BINDING_NAME_TETRISSLAM", "Slam")
-
 
         _createUI()
         _createBlock()
