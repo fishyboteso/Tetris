@@ -191,8 +191,29 @@ end
 
 
 local gameover = false
+local typusList = {0,0,0,0,0,0,0}
 local function _createBlock()
-    typus = math.random(Tetris.blocks.j, Tetris.blocks.o)
+
+    j = 1
+    for i=1,#typusList do
+        if typusList[j] <= typusList[i] then
+            j = i
+        end
+    end
+
+    if typusList[j] > 12 then
+        typus = j
+        typusList[typus] = 0
+    else
+        math.randomseed(GetGameTimeMilliseconds())
+        typus = math.random(Tetris.blocks.j, Tetris.blocks.o)
+        for i=1,#typusList do
+            typusList[i] = typusList[i] + 1
+        end
+        typusList[typus] = 0
+    end
+
+
     Tetris.Block = TetrisMoves.start(typus)
 
     if not _checkMoves() or not _checkBlock() then
