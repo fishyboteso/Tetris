@@ -253,6 +253,10 @@ function Tetris.gameOver()
     EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "gameover", 150, Tetris.gameOver)
 end
 
+local function _slam()
+    EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "slam")
+    Tetris.tick()
+end
 
 local function _manipulate(manipulation)
     if Tetris.running == false then
@@ -268,15 +272,19 @@ local function _manipulate(manipulation)
             result = _execManipulation(Tetris.manipulations.down)
         end
 
-        Tetris.tick()
+        EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "slam", 250, _slam)
+
     elseif manipulation == Tetris.manipulations.down then
         result = _execManipulation(manipulation)
+
     elseif manipulation == Tetris.manipulations.left and maxManipulations.left > 0 then
         maxManipulations.left = maxManipulations.left - 1
         result = _execManipulation(manipulation)
+
     elseif manipulation == Tetris.manipulations.right and maxManipulations.right > 0 then
         maxManipulations.right = maxManipulations.right - 1
         result = _execManipulation(manipulation)
+
     elseif manipulation == Tetris.manipulations.rotate and maxManipulations.rotate > 0 then
         maxManipulations.rotate = maxManipulations.rotate - 1
         result = _execManipulation(manipulation)
