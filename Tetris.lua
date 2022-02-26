@@ -189,23 +189,46 @@ local function _checkBlock()
 end
 
 
+local gameover = false
 local function _createBlock()
     typus = math.random(Tetris.blocks.j, Tetris.blocks.o)
     Tetris.Block = TetrisMoves.start(typus)
 
     if not _checkMoves() or not _checkBlock() then
         EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
-        for i=0,width-1 do
-            for j=0,height-1 do
-                Tetris.array[i][j] = Tetris.blocks.none
-            end
-        end
-        EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "tick", timeout, Tetris.tick)
+        gameover = true
+        EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "gameover", 150, Tetris.gameOver)
     else
         _setBlockToArray(typus)
     end
 
     _drawUI()
+end
+
+
+local greyline = height-1
+function Tetris.gameOver()
+    EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "gameover")
+    EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
+
+    if greyline == -1 then
+        if Tetris.running == true then
+            greyline = height-1
+            gameover = false
+            _createBlock()
+            EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "tick", timeout, Tetris.tick)
+            return
+        end
+    end
+
+    for i=0,width-1 do
+        Tetris.array[i][greyline] = Tetris.blocks.none
+    end
+    _drawUI()
+
+    greyline = greyline - 1
+
+    EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "gameover", 150, Tetris.gameOver)
 end
 
 
@@ -297,16 +320,24 @@ end
 
 --Keybinding Actions
 function Tetris.keyLeft()
-    _manipulate(Tetris.manipulations.left)
+    if gameover == false and Tetris.running == true then
+        _manipulate(Tetris.manipulations.left)
+    end
 end
 function Tetris.keyRight()
-    _manipulate(Tetris.manipulations.right)
+    if gameover == false and Tetris.running == true then
+        _manipulate(Tetris.manipulations.right)
+    end
 end
 function Tetris.keyRotate()
-    _manipulate(Tetris.manipulations.rotate)
+    if gameover == false and Tetris.running == true then
+        _manipulate(Tetris.manipulations.rotate)
+    end
 end
 function Tetris.keySlam()
-    _manipulate(Tetris.manipulations.slam)
+    if gameover == false and Tetris.running == true then
+        _manipulate(Tetris.manipulations.slam)
+    end
 end
 
 
