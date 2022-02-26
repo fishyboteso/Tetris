@@ -175,6 +175,16 @@ local function _checkMoves()
             return false
         end
     end
+
+    return true
+end
+
+
+local function _checkBlock()
+    if Tetris.array[Tetris.Block.a.x][Tetris.Block.a.y] ~= Tetris.blocks.none or Tetris.array[Tetris.Block.b.x][Tetris.Block.b.y] ~= Tetris.blocks.none or
+       Tetris.array[Tetris.Block.c.x][Tetris.Block.c.y] ~= Tetris.blocks.none or Tetris.array[Tetris.Block.d.x][Tetris.Block.d.y] ~= Tetris.blocks.none then
+        return false
+    end
     return true
 end
 
@@ -183,7 +193,7 @@ local function _createBlock()
     typus = math.random(Tetris.blocks.j, Tetris.blocks.o)
     Tetris.Block = TetrisMoves.start(typus)
 
-    if not _checkMoves() then
+    if not _checkMoves() or not _checkBlock() then
         EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
         for i=0,width-1 do
             for j=0,height-1 do
