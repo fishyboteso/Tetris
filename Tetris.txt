@@ -1,8 +1,8 @@
 ## Title: Tetris
 ## Author: Sem
 ## APIVersion: 101032 101033
-## Version: 1.1
-## AddOnVersion: 11
+## Version: 1.2
+## AddOnVersion: 12
 ## DependsOn: LibAddonMenu-2.0>=30
 ## OptionalDependsOn: FishyQR>=120 Chalutier>=114 LibDebugLogger>=180
 ## SavedVariables: Tetrisparamsvar
