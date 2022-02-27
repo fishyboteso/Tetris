@@ -105,6 +105,7 @@ local function _execManipulation(manipulation)
     if Tetris.Block.a.y >= height or Tetris.Block.b.y >= height or
        Tetris.Block.c.y >= height or Tetris.Block.d.y >= height then
         Tetris.Block = deepcopy(tempBlock)
+        Tetrisparams.Block = deepcopy(Tetris.Block)
 
         _setBlockToArray(Tetris.Block.typus)
         return false
@@ -113,6 +114,7 @@ local function _execManipulation(manipulation)
     if Tetris.Block.a.x < 0 or Tetris.Block.b.x < 0 or
        Tetris.Block.c.x < 0 or Tetris.Block.d.x < 0 then
         Tetris.Block = deepcopy(tempBlock)
+        Tetrisparams.Block = deepcopy(Tetris.Block)
 
         _setBlockToArray(Tetris.Block.typus)
         return false
@@ -121,6 +123,7 @@ local function _execManipulation(manipulation)
     if Tetris.Block.a.x >= width or Tetris.Block.b.x >= width or
        Tetris.Block.c.x >= width or Tetris.Block.d.x >= width then
         Tetris.Block = deepcopy(tempBlock)
+        Tetrisparams.Block = deepcopy(Tetris.Block)
 
         _setBlockToArray(Tetris.Block.typus)
         return false
@@ -130,14 +133,15 @@ local function _execManipulation(manipulation)
     if Tetris.array[Tetris.Block.a.x][Tetris.Block.a.y] ~= Tetris.blocks.none or Tetris.array[Tetris.Block.b.x][Tetris.Block.b.y] ~= Tetris.blocks.none or
        Tetris.array[Tetris.Block.c.x][Tetris.Block.c.y] ~= Tetris.blocks.none or Tetris.array[Tetris.Block.d.x][Tetris.Block.d.y] ~= Tetris.blocks.none then
         Tetris.Block = deepcopy(tempBlock)
+        Tetrisparams.Block = deepcopy(Tetris.Block)
 
         _setBlockToArray(Tetris.Block.typus)
         return false
     end
 
     -- set new position
+    Tetrisparams.Block = deepcopy(Tetris.Block)
     _setBlockToArray(Tetris.Block.typus)
-
     return true
 end
 
@@ -166,6 +170,7 @@ local function _drawUI()
             Tetris.UI.background:SetColor(0,0,0,1)
         end
     end
+    Tetrisparams.array = deepcopy(Tetris.array)
 end
 
 
@@ -240,6 +245,7 @@ local function _createBlock()
 
     -- get the Block start layout from  Moves.lua
     Tetris.Block = TetrisMoves.start(typus)
+    Tetrisparams.Block = deepcopy(Tetris.Block)
 
     -- check for "game over"
     if not _checkMoves() or not _checkBlock() then
@@ -522,7 +528,7 @@ local function _createUI()
         Tetris.UI.pixel[i] = {}
         Tetris.array[i] = {}
         for j=0,height-1 do
-            Tetris.array[i][j] = 0
+            if Tetrisparams.array then Tetris.array[i][j] = Tetrisparams.array[i][j] else Tetris.array[i][j] = 0 end
             Tetris.UI.pixel[i][j] = WINDOW_MANAGER:CreateControl(nil, Tetris.UI, CT_TEXTURE)
             Tetris.UI.pixel[i][j]:SetDimensions(Tetrisparams.pixelsize-2, Tetrisparams.pixelsize-2)
             Tetris.UI.pixel[i][j]:SetColor(1, 1, 1, 1)
@@ -722,7 +728,16 @@ function Tetris.OnAddOnLoaded(event, addonName)
         -- create UI
         _createUI()
         _createMenu()
-        _createBlock()
+
+        -- reinit last game from savedvar
+        if Tetrisparams.array then
+            Tetris.array = deepcopy(Tetrisparams.array)
+            Tetris.Block = deepcopy(Tetrisparams.Block)
+        end
+        if not Tetris.Block.typus then
+            _createBlock()
+        end
+
         _drawUI()
 
         -- init state
