@@ -31,14 +31,16 @@ Tetris.blocks = {
 -- SavedVar
 local Tetrisparams = {}
 local Tetrisdefaults = {
-    pixelsize   = 16,
-    timeout     = 500,
-    posx        = 0,
-    posy        = 0
+    pixelsize    = 16,
+    timeout      = 500,
+    posx         = 0,
+    posy         = 0,
+    blink        = true,
+    lookingPause = false
 }
 
 -- Imports
-local logger = LibDebugLogger(Tetris.name)
+--local logger = LibDebugLogger(Tetris.name)
 
 -- Maximum manipulations per tick
 local maxManipulations = { left = 5, right = 5, rotate = 4 }
@@ -416,7 +418,6 @@ local tmpInteractableName = ""
 
 local function _simpleEngine()
     local action, interactableName, _, _, additionalInfo = GetGameCameraInteractableActionInfo()
-    logger:Warn("Tetris Toggle without engine: ", tmpFishingState)
     if additionalInfo == ADDITIONAL_INTERACT_INFO_FISHING_NODE and
        tmpFishingState == 0 then
         tmpFishingState = 1
@@ -426,7 +427,6 @@ local function _simpleEngine()
         Tetris.running = true
         EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "tick", Tetrisparams.timeout, Tetris.tick)
     elseif action and tmpInteractableName == interactableName then
-        logger:Warn("Reelin")
     elseif additionalInfo ~= ADDITIONAL_INTERACT_INFO_FISHING_NODE and
            tmpFishingState == 1 then
         tmpFishingState = 0
@@ -447,7 +447,7 @@ function Tetris.toggle(fishingState)
         return
     end
 
-    if fishingState == Tetris.engine.state.reelin then
+    if fishingState == Tetris.engine.state.reelin and Tetrisparams.blink == true then
         _backgroundBlink()
     else
         EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "reelinBlink")
@@ -455,7 +455,8 @@ function Tetris.toggle(fishingState)
     end
 
     -- Tetris.engine states that start Tetris
-    if fishingState == Tetris.engine.state.looking or fishingState == Tetris.engine.state.fishing or fishingState == Tetris.engine.state.reelin then
+    if (fishingState == Tetris.engine.state.looking and not Tetrisparams.lookingPause) or
+       fishingState == Tetris.engine.state.fishing or fishingState == Tetris.engine.state.reelin then
         if Tetris.running == false then
             HUD_SCENE:AddFragment(Tetris.fragment)
             LOOT_SCENE:AddFragment(Tetris.fragment)
@@ -464,20 +465,21 @@ function Tetris.toggle(fishingState)
         end
 
     -- Tetris.engine states that pause Tetris
-    elseif fishingState == Tetris.engine.state.loot then
+    elseif fishingState == Tetris.engine.state.loot or (fishingState == Tetris.engine.state.looking and Tetrisparams.lookingPause) then
         if Tetris.running == true then
             EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
             Tetris.running = false
         end
+        HUD_SCENE:AddFragment(Tetris.fragment)
 
     --All other Tetris.engine states stop and hide Tetris
     else
         if Tetris.running == true then
             EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
             Tetris.running = false
-            HUD_SCENE:RemoveFragment(Tetris.fragment)
-            LOOT_SCENE:RemoveFragment(Tetris.fragment)
         end
+        HUD_SCENE:RemoveFragment(Tetris.fragment)
+        LOOT_SCENE:RemoveFragment(Tetris.fragment)
     end
 end
 
@@ -559,6 +561,12 @@ local function _createMenu()
         end
     end)
 
+    if Tetris.engine then
+        choiceBlink = {"enabled", "disabled"}
+    else
+        choiceBlink = {"disabled"}
+    end
+
     local optionsData = {
         {
             type = "slider",
@@ -586,15 +594,47 @@ local function _createMenu()
         },
         {
             type = "divider",
-            reference = "TetrisDevider"
         },
         {
             type = "description",
-            text = "Show or hide Tetris field so you can choose a position:"
+            title = "Attention",
+            text = "To use these functions you have to install FishyQR or Chalutier.",
+        },
+        {
+            type = "checkbox",
+            name = "Blink when fish is on the hook.",
+            choices = choiceBlink,
+            getFunc = function() if Tetrisparams.blink == true and Tetris.engine then return true end return false end,
+            setFunc = function(value)
+                if Tetris.engine then
+                    Tetrisparams.blink = value
+                else
+                    Tetrisparams.blink = false
+                end
+            end,
+            tooltip = "Needs Chalutier or FishyQR to enable.",
+            reference = "blinkCheckbox"
+        },
+        {
+            type = "checkbox",
+            name = "Pause while looking at a fishing hole.",
+            getFunc = function() return Tetrisparams.lookingPause end,
+            setFunc = function(value) Tetrisparams.lookingPause = value end,
+            default = Tetrisparams.lookingPause,
+            tooltip = "Needs Chalutier or FishyQR to enable.",
+            reference = "lookingPauseCheckbox"
+        },
+        {
+            type = "divider",
+        },
+        {
+            type = "description",
+            text = "Show or hide Tetris field so you can choose a position:",
+            width = "half"
         },
         {
             type = "button",
-            name = "Show",
+            name = "Show now",
             func = function()
                 if pressedShow == false then
                     pressedShow = true
@@ -632,16 +672,6 @@ function Tetris.OnAddOnLoaded(event, addonName)
         ZO_CreateStringId("SI_BINDING_NAME_TETRISROTATE", "Rotate")
         ZO_CreateStringId("SI_BINDING_NAME_TETRISSLAM", "Slam")
 
-        -- create UI
-        _createUI()
-        _createMenu()
-        _createBlock()
-        _drawUI()
-
-        -- init state
-        Tetris.running = false
-
-
         -- connect to Tetris.engine
         if Chalutier then
             Tetris.engine = Chalutier
@@ -653,11 +683,20 @@ function Tetris.OnAddOnLoaded(event, addonName)
             Tetris.engine = nil
         end
 
+        -- create UI
+        _createUI()
+        _createMenu()
+        _createBlock()
+        _drawUI()
+
+        -- init state
+        Tetris.running = false
+
         if Tetris.engine then
-            logger:Warn("Engine: " .. Tetris.engine.name)
+            --logger:Info("Engine: " .. Tetris.engine.name)
             Tetris.engine.CallbackManager:RegisterCallback(Tetris.engine.name .. Tetris.statechange, Tetris.toggle)
         else
-            logger:Warn("Engine: " .. "None")
+            --logger:Info("Engine: None")
             ZO_PreHookHandler(RETICLE.interact, "OnEffectivelyShown", Tetris.toggle)
             ZO_PreHookHandler(RETICLE.interact, "OnHide", Tetris.toggle)
         end
