@@ -410,18 +410,52 @@ local function _backgroundBlink()
     EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "reelinBlink", 200, _backgroundBlink)
 end
 
+
+local tmpFishingState = 0
+local tmpInteractableName = ""
+
+local function _simpleEngine()
+    local action, interactableName, _, _, additionalInfo = GetGameCameraInteractableActionInfo()
+    logger:Warn("Tetris Toggle without engine: ", tmpFishingState)
+    if additionalInfo == ADDITIONAL_INTERACT_INFO_FISHING_NODE and
+       tmpFishingState == 0 then
+        tmpFishingState = 1
+        tmpInteractableName = interactableName
+        HUD_SCENE:AddFragment(Tetris.fragment)
+        LOOT_SCENE:AddFragment(Tetris.fragment)
+        Tetris.running = true
+        EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "tick", Tetrisparams.timeout, Tetris.tick)
+    elseif action and tmpInteractableName == interactableName then
+        logger:Warn("Reelin")
+    elseif additionalInfo ~= ADDITIONAL_INTERACT_INFO_FISHING_NODE and
+           tmpFishingState == 1 then
+        tmpFishingState = 0
+        tmpInteractableName = ""
+        EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
+        Tetris.running = false
+        HUD_SCENE:RemoveFragment(Tetris.fragment)
+        LOOT_SCENE:RemoveFragment(Tetris.fragment)
+    end
+end
+
 -- Toggle Tetris running state and visibility
 function Tetris.toggle(fishingState)
 
-    if fishingState == FishyCha.state.reelin then
+    --simple engine if no Chalutier engine is available
+    if not Tetris.engine then
+        _simpleEngine()
+        return
+    end
+
+    if fishingState == Tetris.engine.state.reelin then
         _backgroundBlink()
     else
         EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "reelinBlink")
         Tetris.UI.background:SetColor(0, 0, 0, 1)
-    end 
+    end
 
-    -- FishyCha states that start Tetris
-    if fishingState == FishyCha.state.looking or fishingState == FishyCha.state.fishing or fishingState == FishyCha.state.reelin then
+    -- Tetris.engine states that start Tetris
+    if fishingState == Tetris.engine.state.looking or fishingState == Tetris.engine.state.fishing or fishingState == Tetris.engine.state.reelin then
         if Tetris.running == false then
             HUD_SCENE:AddFragment(Tetris.fragment)
             LOOT_SCENE:AddFragment(Tetris.fragment)
@@ -429,14 +463,14 @@ function Tetris.toggle(fishingState)
             EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "tick", Tetrisparams.timeout, Tetris.tick)
         end
 
-    -- FishyCha states that pause Tetris
-    elseif fishingState == FishyCha.state.loot then
+    -- Tetris.engine states that pause Tetris
+    elseif fishingState == Tetris.engine.state.loot then
         if Tetris.running == true then
             EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
             Tetris.running = false
         end
 
-    --All other FishyCha states stop and hide Tetris
+    --All other Tetris.engine states stop and hide Tetris
     else
         if Tetris.running == true then
             EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
@@ -607,8 +641,27 @@ function Tetris.OnAddOnLoaded(event, addonName)
         -- init state
         Tetris.running = false
 
-        -- connect to FishyCha (FishyQR)
-        FishyCha.CallbackManager:RegisterCallback(FishyCha.name .. "FishyCha_STATE_CHANGE", Tetris.toggle)
+
+        -- connect to Tetris.engine
+        if Chalutier then
+            Tetris.engine = Chalutier
+            Tetris.statechange = "CHALUTIER_STATE_CHANGE"
+        elseif FishyCha then
+            Tetris.engine = FishyCha
+            Tetris.statechange = "FishyCha_STATE_CHANGE"
+        else
+            Tetris.engine = nil
+        end
+
+        if Tetris.engine then
+            logger:Warn("Engine: " .. Tetris.engine.name)
+            Tetris.engine.CallbackManager:RegisterCallback(Tetris.engine.name .. Tetris.statechange, Tetris.toggle)
+        else
+            logger:Warn("Engine: " .. "None")
+            ZO_PreHookHandler(RETICLE.interact, "OnEffectivelyShown", Tetris.toggle)
+            ZO_PreHookHandler(RETICLE.interact, "OnHide", Tetris.toggle)
+        end
+
     end
 end
 
