@@ -245,6 +245,8 @@ local function _createBlock()
     if not _checkMoves() or not _checkBlock() then
         EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
         gameover = true
+        Tetris.UI.label:SetText("GAME OVER")
+        Tetris.UI.labelBg:SetHidden(false)
         EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "gameover", 150, Tetris.gameOver)
     else
         _setBlockToArray(typus)
@@ -263,6 +265,7 @@ function Tetris.gameOver()
     if greyline == -1 then
         if Tetris.running == true then
             greyline = height-1
+            Tetris.UI.labelBg:SetHidden(true)
             gameover = false
             _createBlock()
             EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "tick", Tetrisparams.timeout, Tetris.tick)
@@ -460,24 +463,23 @@ function Tetris.toggle(fishingState)
         if Tetris.running == false then
             HUD_SCENE:AddFragment(Tetris.fragment)
             LOOT_SCENE:AddFragment(Tetris.fragment)
+            Tetris.UI.labelBg:SetHidden(true)
             Tetris.running = true
             EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "tick", Tetrisparams.timeout, Tetris.tick)
         end
 
     -- Tetris.engine states that pause Tetris
     elseif fishingState == Tetris.engine.state.loot or (fishingState == Tetris.engine.state.looking and Tetrisparams.lookingPause) then
-        if Tetris.running == true then
-            EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
-            Tetris.running = false
-        end
+        EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
+        Tetris.running = false
+        Tetris.UI.label:SetText("Pause")
+        Tetris.UI.labelBg:SetHidden(false)
         HUD_SCENE:AddFragment(Tetris.fragment)
 
     --All other Tetris.engine states stop and hide Tetris
     else
-        if Tetris.running == true then
-            EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
-            Tetris.running = false
-        end
+        EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
+        Tetris.running = false
         HUD_SCENE:RemoveFragment(Tetris.fragment)
         LOOT_SCENE:RemoveFragment(Tetris.fragment)
     end
@@ -526,9 +528,24 @@ local function _createUI()
             Tetris.UI.pixel[i][j]:SetColor(1, 1, 1, 1)
             Tetris.UI.pixel[i][j]:SetAnchor(TOPLEFT, Tetris.UI.background, TOPLEFT, brdr+1+(i*Tetrisparams.pixelsize), brdr+1+(j*Tetrisparams.pixelsize))
             Tetris.UI.pixel[i][j]:SetHidden(false)
-            Tetris.UI.pixel[i][j]:SetDrawLevel(0)
+            Tetris.UI.pixel[i][j]:SetDrawLevel(1)
         end
     end
+
+    Tetris.UI.labelBg = WINDOW_MANAGER:CreateControl(nil, Tetris.UI, CT_TEXTURE)
+    Tetris.UI.labelBg:SetDimensions(200, 100)
+    Tetris.UI.labelBg:SetColor(0.8, 0.8, 0.8, 0.8)
+    Tetris.UI.labelBg:SetAnchor(CENTER, Tetris.UI, CENTER, 0, 0)
+    Tetris.UI.labelBg:SetDrawLevel(2)
+    Tetris.UI.labelBg:SetHidden(true)
+
+    Tetris.UI.label = WINDOW_MANAGER:CreateControl(Tetris.name .. "label", Tetris.UI.labelBg, CT_LABEL)
+    Tetris.UI.label:SetFont("ZoFontChat")
+    Tetris.UI.label:SetColor(0,0,0)
+    Tetris.UI.label:SetAnchor(CENTER, Tetris.UI.labelBg, CENTER, 0, 0)
+    Tetris.UI.label:SetText("TESTLABEL")
+    Tetris.UI.label:SetDrawLevel(3)
+    Tetris.UI.label:SetHidden(false)
 
     -- Setup fragment for Scene management
     Tetris.fragment = ZO_FadeSceneFragment:New(Tetris.UI, 100, 500)
