@@ -28,10 +28,14 @@ Tetris.blocks = {
     o = 7
 }
 
--- SavedVar defaults
-local Tetrisdefaults = {}
--- SavedVar temp copy
+-- SavedVar
 local Tetrisparams = {}
+local Tetrisdefaults = {
+    pixelsize   = 16,
+    timeout     = 500,
+    posx        = 0,
+    posy        = 0
+}
 
 -- Imports
 local logger = LibDebugLogger(Tetris.name)
@@ -40,8 +44,6 @@ local logger = LibDebugLogger(Tetris.name)
 local maxManipulations = { left = 5, right = 5, rotate = 4 }
 
 -- Constants
-local Tetrisdefaults.pixelsize = 16
-local Tetrisdefaults.timeout = 500
 local brdr = 8
 local width = 10
 local height = 20
@@ -400,52 +402,6 @@ function Tetris.keySlam()
 end
 
 
--- Create UI elements and Fragment
-local function _createUI()
-    dimX = brdr + width*Tetrisparams.pixelsize + brdr
-    dimY = brdr + height*Tetrisparams.pixelsize + brdr
-
-    -- UI Toplevel
-    Tetris.UI = WINDOW_MANAGER:CreateControl(nil, GuiRoot, CT_TOPLEVELCONTROL)
-    Tetris.UI:SetMouseEnabled(true)
-    Tetris.UI:SetClampedToScreen(true)
-    Tetris.UI:SetMovable(true)
-    Tetris.UI:SetDimensions(dimX, dimY)
-    Tetris.UI:SetAnchor(TOPRIGHT, GuiRoot, TOPRIGHT, 300, 100)
-    Tetris.UI:SetDrawLevel(0)
-    Tetris.UI:SetDrawLayer(DL_MAX_VALUE-1)
-    Tetris.UI:SetDrawTier(DT_MAX_VALUE-1)
-
-    -- Black Background
-    Tetris.UI.background = WINDOW_MANAGER:CreateControl(nil, Tetris.UI, CT_TEXTURE)
-    Tetris.UI.background:SetDimensions(dimX, dimY)
-    Tetris.UI.background:SetColor(0, 0, 0, 1)
-    Tetris.UI.background:SetAnchor(TOPLEFT, Tetris.UI, TOPLEFT, 0, 0)
-    Tetris.UI.background:SetHidden(false)
-    Tetris.UI.background:SetDrawLevel(0)
-
-    -- Setup Pixel matrix
-    Tetris.UI.pixel = {}
-    for i=0,width-1 do
-        Tetris.UI.pixel[i] = {}
-        Tetris.array[i] = {}
-        for j=0,height-1 do
-            Tetris.array[i][j] = 0
-            Tetris.UI.pixel[i][j] = WINDOW_MANAGER:CreateControl(nil, Tetris.UI, CT_TEXTURE)
-            Tetris.UI.pixel[i][j]:SetDimensions(Tetrisparams.pixelsize-2, Tetrisparams.pixelsize-2)
-            Tetris.UI.pixel[i][j]:SetColor(1, 1, 1, 1)
-            Tetris.UI.pixel[i][j]:SetAnchor(TOPLEFT, Tetris.UI.background, TOPLEFT, brdr+1+(i*Tetrisparams.pixelsize), brdr+1+(j*Tetrisparams.pixelsize))
-            Tetris.UI.pixel[i][j]:SetHidden(false)
-            Tetris.UI.pixel[i][j]:SetDrawLevel(0)
-        end
-    end
-
-    -- Setup fragment for Scene management
-    Tetris.fragment = ZO_FadeSceneFragment:New(Tetris.UI, 100, 1000)
-    Tetris.UI:SetHidden(true)
-end
-
-
 -- Toggle Tetris running state and visibility
 function Tetris.toggle(fishingState)
     -- FishyCha states that start Tetris
@@ -476,6 +432,141 @@ function Tetris.toggle(fishingState)
 end
 
 
+-- Create UI elements and Fragment
+local function _createUI()
+    dimX = brdr + width*Tetrisparams.pixelsize + brdr
+    dimY = brdr + height*Tetrisparams.pixelsize + brdr
+
+    -- UI Toplevel
+    Tetris.UI = WINDOW_MANAGER:CreateControl(nil, GuiRoot, CT_TOPLEVELCONTROL)
+    Tetris.UI:SetMouseEnabled(true)
+    Tetris.UI:SetClampedToScreen(true)
+    Tetris.UI:SetMovable(true)
+    Tetris.UI:SetDimensions(dimX, dimY)
+    Tetris.UI:SetAnchor(TOPRIGHT, GuiRoot, TOPRIGHT, Tetrisparams.posx, Tetrisparams.posy)
+    Tetris.UI:SetDrawLevel(0)
+    Tetris.UI:SetDrawLayer(DL_MAX_VALUE-1)
+    Tetris.UI:SetDrawTier(DT_MAX_VALUE-1)
+
+
+    EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "savePos", 10000, function()
+        Tetrisparams.posy = Tetris.UI:GetTop()
+        Tetrisparams.posx = Tetris.UI:GetRight() - GuiRoot:GetRight()
+    end)
+
+    -- Black Background
+    Tetris.UI.background = WINDOW_MANAGER:CreateControl(nil, Tetris.UI, CT_TEXTURE)
+    Tetris.UI.background:SetDimensions(dimX, dimY)
+    Tetris.UI.background:SetColor(0, 0, 0, 1)
+    Tetris.UI.background:SetAnchor(TOPLEFT, Tetris.UI, TOPLEFT, 0, 0)
+    Tetris.UI.background:SetHidden(false)
+    Tetris.UI.background:SetDrawLevel(0)
+
+    -- Setup Pixel matrix
+    Tetris.UI.pixel = {}
+    for i=0,width-1 do
+        Tetris.UI.pixel[i] = {}
+        Tetris.array[i] = {}
+        for j=0,height-1 do
+            Tetris.array[i][j] = 0
+            Tetris.UI.pixel[i][j] = WINDOW_MANAGER:CreateControl(nil, Tetris.UI, CT_TEXTURE)
+            Tetris.UI.pixel[i][j]:SetDimensions(Tetrisparams.pixelsize-2, Tetrisparams.pixelsize-2)
+            Tetris.UI.pixel[i][j]:SetColor(1, 1, 1, 1)
+            Tetris.UI.pixel[i][j]:SetAnchor(TOPLEFT, Tetris.UI.background, TOPLEFT, brdr+1+(i*Tetrisparams.pixelsize), brdr+1+(j*Tetrisparams.pixelsize))
+            Tetris.UI.pixel[i][j]:SetHidden(false)
+            Tetris.UI.pixel[i][j]:SetDrawLevel(0)
+        end
+    end
+
+    -- Setup fragment for Scene management
+    Tetris.fragment = ZO_FadeSceneFragment:New(Tetris.UI, 100, 500)
+    Tetris.UI:SetHidden(true)
+end
+
+
+local function _createMenu()
+    --#region addon menu
+    --addon menu
+    local LAM = LibAddonMenu2
+
+    local pressedShow = false
+
+    local panelName = Tetris.name .. "Settings"
+
+    local panelData = {
+        type = "panel",
+        name = Tetris.name .. " Settings",
+        author = Tetris.author,
+    }
+    local panel = LAM:RegisterAddonPanel(panelName, panelData)
+
+    panel:SetHandler("OnEffectivelyHidden", function()
+        Tetrisparams.posy = Tetris.UI:GetTop()
+        Tetrisparams.posx = Tetris.UI:GetRight() - GuiRoot:GetRight()
+        if pressedShow == true then
+            HUD_UI_SCENE:RemoveFragment(Tetris.fragment)
+            Tetris.UI:SetHidden(true)
+        end
+    end)
+
+    local optionsData = {
+        {
+            type = "slider",
+            name = "Pixel Size",
+            min = 1,
+            max = 30,
+            default = Tetrisparams.pixelsize,
+            getFunc = function() return Tetrisparams.pixelsize end,
+            setFunc = function(value)
+                Tetrisparams.pixelsize = value
+            end,
+            tooltip = "Set the size of each pixel of the Tetris field.",
+            requiresReload = true
+        },
+        {
+            type = "slider",
+            name = "Timeout",
+            min = 100,
+            max = 2000,
+            step = 100,
+            default = Tetrisparams.timeout,
+            getFunc = function() return Tetrisparams.timeout end,
+            setFunc = function(value) Tetrisparams.timeout = value end,
+            tooltip = "Set the wait time between each Block Down-move.",
+        },
+        {
+            type = "divider",
+            reference = "TetrisDevider"
+        },
+        {
+            type = "description",
+            text = "Show or hide Tetris field so you can choose a position:"
+        },
+        {
+            type = "button",
+            name = "Show",
+            func = function()
+                if pressedShow == false then
+                    pressedShow = true
+                    HUD_UI_SCENE:AddFragment(Tetris.fragment)
+                    Tetris.UI:SetHidden(false)
+                elseif pressedShow == true then
+                    pressedShow = false
+                    Tetrisparams.posy = Tetris.UI:GetTop()
+                    Tetrisparams.posx = Tetris.UI:GetRight() - GuiRoot:GetRight()
+                    HUD_UI_SCENE:RemoveFragment(Tetris.fragment)
+                    Tetris.UI:SetHidden(true)
+                end
+            end,
+            width = "half",
+            requiresReload = false
+        }
+    }
+    LAM:RegisterOptionControls(panelName, optionsData)
+
+end
+
+
 -- Main function
 function Tetris.OnAddOnLoaded(event, addonName)
     if addonName == Tetris.name then
@@ -493,6 +584,7 @@ function Tetris.OnAddOnLoaded(event, addonName)
 
         -- create UI
         _createUI()
+        _createMenu()
         _createBlock()
         _drawUI()
 

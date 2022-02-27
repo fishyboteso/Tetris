@@ -3,7 +3,7 @@
 ## APIVersion: 101032 101033
 ## Version: 1.1
 ## AddOnVersion: 11
-## DependsOn: FishyQR>=120
+## DependsOn: FishyQR>=120 LibAddonMenu-2.0>=30
 ## OptionalDependsOn: LibDebugLogger>=180
 ## SavedVariables: Tetrisparamsvar
 
