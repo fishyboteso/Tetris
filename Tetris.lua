@@ -1,3 +1,4 @@
+-- Addon Struct, holds everything of importance
 Tetris = {
     name = "Tetris",
     author = "Sem",
@@ -6,6 +7,7 @@ Tetris = {
     blocks = {},
     Block = {}
 }
+-- Struct for Block Manipulations
 Tetris.manipulations = {
     nothing = 0,
     left = 1,
@@ -14,6 +16,7 @@ Tetris.manipulations = {
     slam = 4,
     down = 5
 }
+--Struct for Block types
 Tetris.blocks = {
     none = 0,
     j = 1,
@@ -25,24 +28,32 @@ Tetris.blocks = {
     o = 7
 }
 
---local Tetrisparams = {}
---local Tetrisdefaults = {}
-local _tick
+-- SavedVar defaults
+local Tetrisdefaults = {}
+-- SavedVar temp copy
+local Tetrisparams = {}
 
+-- Imports
 local logger = LibDebugLogger(Tetris.name)
 
--- maximum manipulations per tick
+-- Maximum manipulations per tick
 local maxManipulations = { left = 5, right = 5, rotate = 4 }
 
-local pixelsize = 16
+-- Constants
+local Tetrisdefaults.pixelsize = 16
+local Tetrisdefaults.timeout = 500
 local brdr = 8
 local width = 10
 local height = 20
-local timeout = 500
+
+-- Temporary variables
+local gameover = false
+local typusList = {0,0,0,0,0,0,0}
+local greyline = height-1
 
 
-
---http://lua-users.org/wiki/CopyTable
+-- Copy a nested table
+-- http://lua-users.org/wiki/CopyTable
 function deepcopy(orig)
     local orig_type = type(orig)
     local copy
@@ -59,6 +70,7 @@ function deepcopy(orig)
 end
 
 
+-- Set Block in Tetris array
 local function _setBlockToArray(typus)
     Tetris.array[Tetris.Block.a.x][Tetris.Block.a.y] = typus
     Tetris.array[Tetris.Block.b.x][Tetris.Block.b.y] = typus
@@ -67,7 +79,7 @@ local function _setBlockToArray(typus)
 end
 
 
--- executes Manipulation on pixel array if possible
+-- Executes Manipulation on pixel array if possible
 local function _execManipulation(manipulation)
     tempBlock = deepcopy(Tetris.Block)
 
@@ -126,7 +138,7 @@ local function _execManipulation(manipulation)
 end
 
 
--- drawUI
+-- Redraws the User Interface of Tetris
 local function _drawUI()
     for i=0,width-1 do
         for j=0,height-1 do
@@ -153,8 +165,9 @@ local function _drawUI()
 end
 
 
---returns TRUE if any more TetrisMoves are possible for Block
---else FALSE
+-- Checks if any more downwards moves are possible for active Block
+-- returns TRUE if down move is possible for Block
+-- else FALSE
 local function _checkMoves()
     if Tetris.Block.a.y >= Tetris.Block.b.y and Tetris.Block.a.y >= Tetris.Block.c.y and Tetris.Block.a.y >= Tetris.Block.d.y then
         if Tetris.array[Tetris.Block.a.x][Tetris.Block.a.y+1] ~= Tetris.blocks.none then
@@ -181,6 +194,9 @@ local function _checkMoves()
 end
 
 
+-- Checks if the new Block fits into the field
+-- returns TRUE if a new Block can be spawned
+-- else FALSE
 local function _checkBlock()
     if Tetris.array[Tetris.Block.a.x][Tetris.Block.a.y] ~= Tetris.blocks.none or Tetris.array[Tetris.Block.b.x][Tetris.Block.b.y] ~= Tetris.blocks.none or
        Tetris.array[Tetris.Block.c.x][Tetris.Block.c.y] ~= Tetris.blocks.none or Tetris.array[Tetris.Block.d.x][Tetris.Block.d.y] ~= Tetris.blocks.none then
@@ -190,10 +206,11 @@ local function _checkBlock()
 end
 
 
-local gameover = false
-local typusList = {0,0,0,0,0,0,0}
+-- Creates a new Block if possible, else it triggers "game over" state
 local function _createBlock()
 
+    -- complicated way to make sure that every Block type comes at least every 13th turn
+    -- typuslist holds a counter for each block type
     j = 1
     for i=1,#typusList do
         if typusList[j] <= typusList[i] then
@@ -201,10 +218,13 @@ local function _createBlock()
         end
     end
 
+    -- if any Block type was not played for 13 turns, it will be played now
     if typusList[j] > 12 then
         typus = j
         typusList[typus] = 0
+    -- else a random block will be played
     else
+        -- math.random does not feel random in a pleasant way
         math.randomseed(GetGameTimeMilliseconds())
         typus = math.random(Tetris.blocks.j, Tetris.blocks.o)
         for i=1,#typusList do
@@ -214,8 +234,10 @@ local function _createBlock()
     end
 
 
+    -- get the Block start layout from  Moves.lua
     Tetris.Block = TetrisMoves.start(typus)
 
+    -- check for "game over"
     if not _checkMoves() or not _checkBlock() then
         EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
         gameover = true
@@ -228,21 +250,23 @@ local function _createBlock()
 end
 
 
-local greyline = height-1
+-- "Game over" state control and animation
 function Tetris.gameOver()
     EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "gameover")
     EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
 
+    -- exit condition, for when all lines are removed
     if greyline == -1 then
         if Tetris.running == true then
             greyline = height-1
             gameover = false
             _createBlock()
-            EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "tick", timeout, Tetris.tick)
+            EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "tick", Tetrisparams.timeout, Tetris.tick)
             return
         end
     end
 
+    -- remove next line and timeout
     for i=0,width-1 do
         Tetris.array[i][greyline] = Tetris.blocks.none
     end
@@ -253,18 +277,21 @@ function Tetris.gameOver()
     EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "gameover", 150, Tetris.gameOver)
 end
 
+
+-- Slam timeout to allow one more manipulation after slam
 local function _slam()
     EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "slam")
     Tetris.tick()
 end
 
+
+-- Manipulate active Block (left,right,rotate,slam)
 local function _manipulate(manipulation)
     if Tetris.running == false then
         return false
     end
 
     result = true
-    -- rule: allow only max Manipulations
     if manipulation == Tetris.manipulations.slam then
         EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
 
@@ -272,6 +299,7 @@ local function _manipulate(manipulation)
             result = _execManipulation(Tetris.manipulations.down)
         end
 
+        -- slam timeout to allow one more manipulation after slam
         EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "slam", 250, _slam)
 
     elseif manipulation == Tetris.manipulations.down then
@@ -295,6 +323,8 @@ local function _manipulate(manipulation)
     return result
 end
 
+
+-- Remove lines that are completed
 local function _removeLines()
     rm = 0
 
@@ -342,10 +372,9 @@ function Tetris.tick()
 
     --set timer
     if Tetris.running == true then
-        EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "tick", timeout, Tetris.tick)
+        EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "tick", Tetrisparams.timeout, Tetris.tick)
     end
 end
-
 
 
 --Keybinding Actions
@@ -371,10 +400,12 @@ function Tetris.keySlam()
 end
 
 
+-- Create UI elements and Fragment
 local function _createUI()
-    dimX = brdr + width*pixelsize + brdr
-    dimY = brdr + height*pixelsize + brdr
+    dimX = brdr + width*Tetrisparams.pixelsize + brdr
+    dimY = brdr + height*Tetrisparams.pixelsize + brdr
 
+    -- UI Toplevel
     Tetris.UI = WINDOW_MANAGER:CreateControl(nil, GuiRoot, CT_TOPLEVELCONTROL)
     Tetris.UI:SetMouseEnabled(true)
     Tetris.UI:SetClampedToScreen(true)
@@ -385,6 +416,7 @@ local function _createUI()
     Tetris.UI:SetDrawLayer(DL_MAX_VALUE-1)
     Tetris.UI:SetDrawTier(DT_MAX_VALUE-1)
 
+    -- Black Background
     Tetris.UI.background = WINDOW_MANAGER:CreateControl(nil, Tetris.UI, CT_TEXTURE)
     Tetris.UI.background:SetDimensions(dimX, dimY)
     Tetris.UI.background:SetColor(0, 0, 0, 1)
@@ -392,40 +424,47 @@ local function _createUI()
     Tetris.UI.background:SetHidden(false)
     Tetris.UI.background:SetDrawLevel(0)
 
+    -- Setup Pixel matrix
     Tetris.UI.pixel = {}
-
     for i=0,width-1 do
         Tetris.UI.pixel[i] = {}
         Tetris.array[i] = {}
         for j=0,height-1 do
             Tetris.array[i][j] = 0
             Tetris.UI.pixel[i][j] = WINDOW_MANAGER:CreateControl(nil, Tetris.UI, CT_TEXTURE)
-            Tetris.UI.pixel[i][j]:SetDimensions(pixelsize-2, pixelsize-2)
+            Tetris.UI.pixel[i][j]:SetDimensions(Tetrisparams.pixelsize-2, Tetrisparams.pixelsize-2)
             Tetris.UI.pixel[i][j]:SetColor(1, 1, 1, 1)
-            Tetris.UI.pixel[i][j]:SetAnchor(TOPLEFT, Tetris.UI.background, TOPLEFT, brdr+1+(i*pixelsize), brdr+1+(j*pixelsize))
+            Tetris.UI.pixel[i][j]:SetAnchor(TOPLEFT, Tetris.UI.background, TOPLEFT, brdr+1+(i*Tetrisparams.pixelsize), brdr+1+(j*Tetrisparams.pixelsize))
             Tetris.UI.pixel[i][j]:SetHidden(false)
             Tetris.UI.pixel[i][j]:SetDrawLevel(0)
         end
     end
 
+    -- Setup fragment for Scene management
     Tetris.fragment = ZO_FadeSceneFragment:New(Tetris.UI, 100, 1000)
     Tetris.UI:SetHidden(true)
 end
 
 
+-- Toggle Tetris running state and visibility
 function Tetris.toggle(fishingState)
+    -- FishyCha states that start Tetris
     if fishingState == FishyCha.state.looking or fishingState == FishyCha.state.fishing or fishingState == FishyCha.state.reelin then
         if Tetris.running == false then
             HUD_SCENE:AddFragment(Tetris.fragment)
             LOOT_SCENE:AddFragment(Tetris.fragment)
             Tetris.running = true
-            EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "tick", timeout, Tetris.tick)
+            EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "tick", Tetrisparams.timeout, Tetris.tick)
         end
+
+    -- FishyCha states that pause Tetris
     elseif fishingState == FishyCha.state.loot then
         if Tetris.running == true then
             EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
             Tetris.running = false
         end
+
+    --All other FishyCha states stop and hide Tetris
     else
         if Tetris.running == true then
             EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
@@ -437,27 +476,33 @@ function Tetris.toggle(fishingState)
 end
 
 
+-- Main function
 function Tetris.OnAddOnLoaded(event, addonName)
     if addonName == Tetris.name then
         -- init once and never come here again
         EVENT_MANAGER:UnregisterForEvent(Tetris.name, EVENT_ADD_ON_LOADED)
 
         -- save/load last game
-        --Tetrisparams = ZO_SavedVars:NewAccountWide("FishyQRparamsvar", 2, nil, Tetrisdefaults)
+        Tetrisparams = ZO_SavedVars:NewAccountWide("Tetrisparamsvar", 1, nil, Tetrisdefaults)
 
+        -- strings for keybindings
         ZO_CreateStringId("SI_BINDING_NAME_TETRISLEFT", "Move Left")
         ZO_CreateStringId("SI_BINDING_NAME_TETRISRIGHT", "Move Right")
         ZO_CreateStringId("SI_BINDING_NAME_TETRISROTATE", "Rotate")
         ZO_CreateStringId("SI_BINDING_NAME_TETRISSLAM", "Slam")
 
+        -- create UI
         _createUI()
         _createBlock()
         _drawUI()
 
+        -- init state
         Tetris.running = false
 
+        -- connect to FishyCha (FishyQR)
         FishyCha.CallbackManager:RegisterCallback(FishyCha.name .. "FishyCha_STATE_CHANGE", Tetris.toggle)
     end
 end
 
+-- Hook into game load system
 EVENT_MANAGER:RegisterForEvent(Tetris.name, EVENT_ADD_ON_LOADED, Tetris.OnAddOnLoaded)
