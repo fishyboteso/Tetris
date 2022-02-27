@@ -402,8 +402,24 @@ function Tetris.keySlam()
 end
 
 
+local blink = 1
+local function _backgroundBlink()
+    EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "reelinBlink")
+    Tetris.UI.background:SetColor(blink, blink, blink, 1)
+    blink = (blink + 1) % 2
+    EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "reelinBlink", 200, _backgroundBlink)
+end
+
 -- Toggle Tetris running state and visibility
 function Tetris.toggle(fishingState)
+
+    if fishingState == FishyCha.state.reelin then
+        _backgroundBlink()
+    else
+        EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "reelinBlink")
+        Tetris.UI.background:SetColor(0, 0, 0, 1)
+    end 
+
     -- FishyCha states that start Tetris
     if fishingState == FishyCha.state.looking or fishingState == FishyCha.state.fishing or fishingState == FishyCha.state.reelin then
         if Tetris.running == false then
