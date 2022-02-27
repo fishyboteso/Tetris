@@ -458,8 +458,8 @@ function Tetris.toggle(fishingState)
     end
 
     -- Tetris.engine states that start Tetris
-    if (fishingState == Tetris.engine.state.looking and not Tetrisparams.lookingPause) or
-       fishingState == Tetris.engine.state.fishing or fishingState == Tetris.engine.state.reelin then
+    if ((fishingState == Tetris.engine.state.looking or fishingState == Tetris.engine.state.reelin) and not Tetrisparams.lookingPause) or
+       fishingState == Tetris.engine.state.fishing then
         if Tetris.running == false then
             HUD_SCENE:AddFragment(Tetris.fragment)
             LOOT_SCENE:AddFragment(Tetris.fragment)
@@ -469,7 +469,8 @@ function Tetris.toggle(fishingState)
         end
 
     -- Tetris.engine states that pause Tetris
-    elseif fishingState == Tetris.engine.state.loot or (fishingState == Tetris.engine.state.looking and Tetrisparams.lookingPause) then
+    elseif fishingState == Tetris.engine.state.loot or
+           ((fishingState == Tetris.engine.state.reelin or fishingState == Tetris.engine.state.looking) and Tetrisparams.lookingPause) then
         EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
         Tetris.running = false
         Tetris.UI.label:SetText("Pause")
