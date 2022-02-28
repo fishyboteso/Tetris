@@ -5,6 +5,13 @@
 It can integrate state machines from [fishyboteso/FishyQR](https://github.com/fishyboteso/FishyQR) or [fishyboteso/Chalutier](https://github.com/fishyboteso/Chalutier) for brilliant extra features.
   
 ## Installation:
+### With Minion:
+- Download [Tetris for Fishing](https://www.esoui.com/downloads/info3314-TetrisforFishing.html)
+- Depends on [LibAddonMenu](https://www.esoui.com/downloads/info7-LibAddonMenu.html)
+- Optionally depends on [Chalutier](https://www.esoui.com/downloads/info2934-Chalutier.html)
+- Set up **keybindings** for Tetris in the game
+
+### By Hand:
 - Download the latest release of [Tetris.zip](https://github.com/fishyboteso/Tetris/releases)
 - Download [LibAddonMenu-2](https://www.esoui.com/downloads/info7-LibAddonMenu.html)
 - Optionally download [Chalutier](https://www.esoui.com/downloads/info2934-Chalutier.html) for brilliant extra features
