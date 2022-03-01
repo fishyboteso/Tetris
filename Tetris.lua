@@ -369,6 +369,11 @@ function Tetris.tick()
     --unset timer
     EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
 
+    -- no ticks in game menu
+    if SCENE_MANAGER:IsShowing("gameMenuInGame") == true then
+		return
+	end
+
     if not _manipulate(Tetris.manipulations.down) then
         _removeLines()
         _createBlock()
@@ -564,7 +569,7 @@ local function _createMenu()
 
     local panelData = {
         type = "panel",
-        name = Tetris.name .. " Settings",
+        name = Tetris.name,
         author = Tetris.author,
     }
     local panel = LAM:RegisterAddonPanel(panelName, panelData)
@@ -577,12 +582,6 @@ local function _createMenu()
             Tetris.UI:SetHidden(true)
         end
     end)
-
-    if Tetris.engine then
-        choiceBlink = {"enabled", "disabled"}
-    else
-        choiceBlink = {"disabled"}
-    end
 
     local optionsData = {
         {
@@ -600,14 +599,15 @@ local function _createMenu()
         },
         {
             type = "slider",
-            name = "Timeout",
-            min = 100,
-            max = 2000,
-            step = 100,
-            default = Tetrisparams.timeout,
-            getFunc = function() return Tetrisparams.timeout end,
-            setFunc = function(value) Tetrisparams.timeout = value end,
-            tooltip = "Set the wait time between each Block Down-move.",
+            name = "Gamespeed",
+            min = 1,
+            max = 20,
+            step = 1,
+            default = 20 - math.floor(Tetrisparams.timeout / 100),
+            getFunc = function() return (20 - math.floor(Tetrisparams.timeout / 100)) end,
+            setFunc = function(value) Tetrisparams.timeout = ((20 - value) * 100) end,
+            tooltip = "Blocks will drop faster with higher Gamespeeds.",
+            requiresReload = false
         },
         {
             type = "divider",
@@ -615,31 +615,29 @@ local function _createMenu()
         {
             type = "description",
             title = "Attention",
-            text = "To use these functions you have to install FishyQR or Chalutier.",
+            text = "To use these functions you have to install Chalutier.",
         },
         {
             type = "checkbox",
             name = "Blink when fish is on the hook.",
-            choices = choiceBlink,
-            getFunc = function() if Tetrisparams.blink == true and Tetris.engine then return true end return false end,
-            setFunc = function(value)
-                if Tetris.engine then
-                    Tetrisparams.blink = value
-                else
-                    Tetrisparams.blink = false
-                end
-            end,
-            tooltip = "Needs Chalutier or FishyQR to enable.",
-            reference = "blinkCheckbox"
+            disabled = function() if Tetris.engine then return false end return true end,
+            default = function() if Tetris.engine then return Tetrisparams.blink end return false end,
+            getFunc = function() if Tetris.engine then return Tetrisparams.blink end return false end,
+            setFunc = function(value) Tetrisparams.blink = value end,
+            tooltip = "Needs Chalutier to enable.",
+            reference = "blinkCheckbox",
+            requiresReload = false
         },
         {
             type = "checkbox",
             name = "Pause while looking at a fishing hole.",
-            getFunc = function() return Tetrisparams.lookingPause end,
+            disabled = function() if Tetris.engine then return false end return true end,
+            default = function() if Tetris.engine then return Tetrisparams.lookingPause end return false end,
+            getFunc = function() if Tetris.engine then return Tetrisparams.lookingPause end return false end,
             setFunc = function(value) Tetrisparams.lookingPause = value end,
-            default = Tetrisparams.lookingPause,
-            tooltip = "Needs Chalutier or FishyQR to enable.",
-            reference = "lookingPauseCheckbox"
+            tooltip = "Needs Chalutier to enable.",
+            reference = "lookingPauseCheckbox",
+            requiresReload = false
         },
         {
             type = "divider",
@@ -647,11 +645,11 @@ local function _createMenu()
         {
             type = "description",
             text = "Show or hide Tetris field so you can choose a position:",
-            width = "half"
+            width = "full"
         },
         {
             type = "button",
-            name = "Show now",
+            name = "Tetris visibility",
             func = function()
                 if pressedShow == false then
                     pressedShow = true
@@ -666,7 +664,28 @@ local function _createMenu()
                 end
             end,
             width = "half",
-            requiresReload = false
+            requiresReload = false,
+            reference = "uishowbutton1"
+        },
+        {
+            type = "button",
+            name = "Tetris visibility",
+            func = function()
+                if pressedShow == false then
+                    pressedShow = true
+                    HUD_UI_SCENE:AddFragment(Tetris.fragment)
+                    Tetris.UI:SetHidden(false)
+                elseif pressedShow == true then
+                    pressedShow = false
+                    Tetrisparams.posy = Tetris.UI:GetTop()
+                    Tetrisparams.posx = Tetris.UI:GetRight() - GuiRoot:GetRight()
+                    HUD_UI_SCENE:RemoveFragment(Tetris.fragment)
+                    Tetris.UI:SetHidden(true)
+                end
+            end,
+            width = "half",
+            requiresReload = false,
+            reference = "uishowbutton2"
         }
     }
     LAM:RegisterOptionControls(panelName, optionsData)
