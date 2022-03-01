@@ -503,12 +503,6 @@ local function _createUI()
     Tetris.UI:SetDrawLayer(DL_MAX_VALUE-1)
     Tetris.UI:SetDrawTier(DT_MAX_VALUE-1)
 
-
-    EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "savePos", 10000, function()
-        Tetrisparams.posy = Tetris.UI:GetTop()
-        Tetrisparams.posx = Tetris.UI:GetRight() - GuiRoot:GetRight()
-    end)
-
     -- Black Background
     Tetris.UI.background = WINDOW_MANAGER:CreateControl(nil, Tetris.UI, CT_TEXTURE)
     Tetris.UI.background:SetDimensions(dimX, dimY)
@@ -549,8 +543,13 @@ local function _createUI()
     Tetris.UI.label:SetHidden(false)
 
     -- Setup fragment for Scene management
-    Tetris.fragment = ZO_FadeSceneFragment:New(Tetris.UI, 100, 500)
+    Tetris.fragment = ZO_FadeSceneFragment:New(Tetris.UI, 100, 200)
     Tetris.UI:SetHidden(true)
+
+    Tetris.UI:SetHandler("OnMoveStop", function()
+        Tetrisparams.posy = Tetris.UI:GetTop()
+        Tetrisparams.posx = Tetris.UI:GetRight() - GuiRoot:GetRight()
+    end)
 end
 
 
