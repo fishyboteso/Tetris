@@ -36,7 +36,10 @@ local Tetrisdefaults = {
     posx         = 0,
     posy         = 0,
     blink        = true,
-    lookingPause = false
+    lookingPause = false,
+    bscore = 0,
+    lscore = 0,
+    showStats = true
 }
 
 -- Imports
@@ -251,12 +254,19 @@ local function _createBlock()
     if not _checkMoves() or not _checkBlock() then
         EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
         gameover = true
-        Tetris.UI.label:SetText("GAME OVER")
+        if Tetrisparams.showStats == true then
+            Tetris.UI.label:SetText("GAME OVER\nLines removed: " .. Tetrisparams.lscore .. "\nBlocks spawned: " .. Tetrisparams.bscore)
+        else
+            Tetris.UI.label:SetText("GAME OVER")
+        end
+        Tetris.UI.label:SetHorizontalAlignment(TEXT_ALIGN_CENTER)
         Tetris.UI.labelBg:SetHidden(false)
         EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "gameover", 150, Tetris.gameOver)
     else
         _setBlockToArray(typus)
     end
+
+    Tetrisparams.bscore = Tetrisparams.bscore + 1
 
     _drawUI()
 end
@@ -269,6 +279,9 @@ function Tetris.gameOver()
 
     -- exit condition, for when all lines are removed
     if greyline == -1 then
+        Tetrisparams.bscore = 0
+        Tetrisparams.lscore = 0
+
         if Tetris.running == true then
             greyline = height-1
             Tetris.UI.labelBg:SetHidden(true)
@@ -366,6 +379,8 @@ local function _removeLines()
             rm = rm + 1
         end
     end
+
+    Tetrisparams.lscore = Tetrisparams.lscore + rm
     _drawUI()
 end
 
@@ -484,7 +499,13 @@ function Tetris.toggle(fishingState)
            ((fishingState == Tetris.engine.state.reelin or fishingState == Tetris.engine.state.looking) and Tetrisparams.lookingPause) then
         EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
         Tetris.running = false
-        Tetris.UI.label:SetText("Pause")
+
+        if Tetrisparams.showStats == true then
+            Tetris.UI.label:SetText("Pause\nLines removed: " .. Tetrisparams.lscore .. "\nBlocks spawned: " .. Tetrisparams.bscore)
+        else
+            Tetris.UI.label:SetText("Pause")
+        end
+        Tetris.UI.label:SetHorizontalAlignment(TEXT_ALIGN_CENTER)
         Tetris.UI.labelBg:SetHidden(false)
         HUD_SCENE:AddFragment(Tetris.fragment)
 
@@ -616,6 +637,14 @@ local function _createMenu()
             requiresReload = false
         },
         {
+            type = "checkbox",
+            name = "Show stats in Pause and Game Over screen.",
+            default = Tetrisparams.showStats,
+            getFunc = function() return Tetrisparams.showStats end,
+            setFunc = function(value) Tetrisparams.showStats = value end,
+            requiresReload = false
+        },
+        {
             type = "divider",
         },
         {
@@ -631,7 +660,6 @@ local function _createMenu()
             getFunc = function() if Tetris.engine then return Tetrisparams.blink end return false end,
             setFunc = function(value) Tetrisparams.blink = value end,
             tooltip = "Needs Chalutier to enable.",
-            reference = "blinkCheckbox",
             requiresReload = false
         },
         {
@@ -642,7 +670,6 @@ local function _createMenu()
             getFunc = function() if Tetris.engine then return Tetrisparams.lookingPause end return false end,
             setFunc = function(value) Tetrisparams.lookingPause = value end,
             tooltip = "Needs Chalutier to enable.",
-            reference = "lookingPauseCheckbox",
             requiresReload = false
         },
         {
@@ -671,7 +698,6 @@ local function _createMenu()
             end,
             width = "half",
             requiresReload = false,
-            reference = "uishowbutton1"
         },
         {
             type = "button",
@@ -691,7 +717,6 @@ local function _createMenu()
             end,
             width = "half",
             requiresReload = false,
-            reference = "uishowbutton2"
         }
     }
     LAM:RegisterOptionControls(panelName, optionsData)
@@ -744,10 +769,8 @@ function Tetris.OnAddOnLoaded(event, addonName)
         Tetris.running = false
 
         if Tetris.engine then
-            --logger:Info("Engine: " .. Tetris.engine.name)
             Tetris.engine.CallbackManager:RegisterCallback(Tetris.engine.name .. Tetris.statechange, Tetris.toggle)
         else
-            --logger:Info("Engine: None")
             ZO_PreHookHandler(RETICLE.interact, "OnEffectivelyShown", Tetris.toggle)
             ZO_PreHookHandler(RETICLE.interact, "OnHide", Tetris.toggle)
         end
