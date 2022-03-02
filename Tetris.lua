@@ -58,6 +58,9 @@ local gameover = false
 local typusList = {0,0,0,0,0,0,0}
 local greyline = height-1
 
+local blink = 1
+local tmpFishingState = 0
+local tmpInteractableName = ""
 
 -- Copy a nested table
 -- http://lua-users.org/wiki/CopyTable
@@ -433,7 +436,6 @@ function Tetris.keySlam()
 end
 
 
-local blink = 1
 local function _backgroundBlink()
     EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "reelinBlink")
     Tetris.UI.background:SetColor(blink, blink, blink, 1)
@@ -441,9 +443,6 @@ local function _backgroundBlink()
     EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "reelinBlink", 200, _backgroundBlink)
 end
 
-
-local tmpFishingState = 0
-local tmpInteractableName = ""
 
 local function _simpleEngine()
     local action, interactableName, _, _, additionalInfo = GetGameCameraInteractableActionInfo()
@@ -466,6 +465,7 @@ local function _simpleEngine()
         LOOT_SCENE:RemoveFragment(Tetris.fragment)
     end
 end
+
 
 -- Toggle Tetris running state and visibility
 function Tetris.toggle(fishingState)
