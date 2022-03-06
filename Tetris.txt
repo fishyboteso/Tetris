@@ -1,11 +1,11 @@
 ## Title: Tetris
-## Description: Play Tetris while fishing. |c000088Version: 1.3|r
+## Description: Play Tetris while fishing. |c0000C0Version: 1.4|r
 ## Author: |c0000C0Sem|r
 ## APIVersion: 101032 101033
-## Version: 1.3
-## AddOnVersion: 13
+## Version: 1.4
+## AddOnVersion: 14
 ## DependsOn: LibAddonMenu-2.0>=30
-## OptionalDependsOn: FishyQR>=120 Chalutier>=114 LibDebugLogger>=180
+## OptionalDependsOn: FishyQR>=120 Chalutier>=130 LibDebugLogger>=180
 ## SavedVariables: Tetrisparamsvar
 
 ## This Add-On is not created by, affiliated with or sponsored by ZeniMax Media Inc. or its affiliates. The Elder Scrolls® and related logos are registered trademarks or trademarks of ZeniMax Media Inc. in the United States and/or other countries. All rights reserved.
