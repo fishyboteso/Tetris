@@ -31,9 +31,10 @@ It can integrate state machines from [fishyboteso/FishyQR](https://github.com/fi
 [![Play Tetris while fishing in Elderscrolls Online](https://img.youtube.com/vi/Qh1E58Fy0AQ/0.jpg)]( https://www.youtube.com/watch?v=Qh1E58Fy0AQ)
 
 ### TODO:
-- Maybe add a preview of the next block
-- Try to add Votans Fisherman as engine
-- improve simple engine to include blink and pause  
+- Pause Message when no keybindings are set
+- Add a preview of the next block
+- Add Votans Fisherman as engine
+- Improve simple engine to include blink and pause  
   
 ### DONE:
 - Better UI (animation for deleting lines and game over, fade out when hiding, blink when fish is hooked, show "game over" and "pause" label)
