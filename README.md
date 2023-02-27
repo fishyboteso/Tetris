@@ -31,10 +31,17 @@ It can integrate state machines from [fishyboteso/FishyQR](https://github.com/fi
 [![Play Tetris while fishing in Elderscrolls Online](https://img.youtube.com/vi/Qh1E58Fy0AQ/0.jpg)]( https://www.youtube.com/watch?v=Qh1E58Fy0AQ)
 
 ### TODO:
-- Pause Message when no keybindings are set
 - Add a preview of the next block
+  - add Menu to enable/disable Preview
+  - remove next block on "game over", generate new one on next game
+  - edge cases (first start, reloadUI)
+  - SavedVar
+  - share common constants with tetris.lua
+  - show/hide respects loot scene condition
+- Pause Message when no keybindings are set
 - Add Votans Fisherman as engine
 - Improve simple engine to include blink and pause  
+- Optional increasing speed
   
 ### DONE:
 - Better UI (animation for deleting lines and game over, fade out when hiding, blink when fish is hooked, show "game over" and "pause" label)
