@@ -152,31 +152,37 @@ local function _execManipulation(manipulation)
 end
 
 
--- Redraws the User Interface of Tetris
-local function _drawUI()
-    for i=0,width-1 do
-        for j=0,height-1 do
-            if Tetris.array[i][j] == Tetris.blocks.j then
-                Tetris.UI.pixel[i][j]:SetColor(0.06, 0.12, 0.90, 1) --blue
-            elseif Tetris.array[i][j] == Tetris.blocks.l then
-                Tetris.UI.pixel[i][j]:SetColor(0.87, 0.60, 0.15, 1) --orange
-            elseif Tetris.array[i][j] == Tetris.blocks.t then
-                Tetris.UI.pixel[i][j]:SetColor(0.53, 0.17, 0.90, 1) --purple
-            elseif Tetris.array[i][j] == Tetris.blocks.i then
-                Tetris.UI.pixel[i][j]:SetColor(0.41, 0.91, 0.93, 1) --turquoise
-            elseif Tetris.array[i][j] == Tetris.blocks.z then
-                Tetris.UI.pixel[i][j]:SetColor(0.83, 0.18, 0.07, 1) --red
-            elseif Tetris.array[i][j] == Tetris.blocks.s then
-                Tetris.UI.pixel[i][j]:SetColor(0.41, 0.90, 0.21, 1) --green
-            elseif Tetris.array[i][j] == Tetris.blocks.o then
-                Tetris.UI.pixel[i][j]:SetColor(0.93, 0.92, 0.22, 1) --yellow
-            elseif Tetris.array[i][j] == Tetris.blocks.none then
-                Tetris.UI.pixel[i][j]:SetColor(1, 1, 1, 1) --white
+-- Draw the target UI based on source array
+local function _drawPixel(source, target, w, h, bg)
+    for i=0,w-1 do
+        for j=0,h-1 do
+            if source[i][j] == Tetris.blocks.j then
+                target[i][j]:SetColor(0.06, 0.12, 0.90, 1) --blue
+            elseif source[i][j] == Tetris.blocks.l then
+                target[i][j]:SetColor(0.87, 0.60, 0.15, 1) --orange
+            elseif source[i][j] == Tetris.blocks.t then
+                target[i][j]:SetColor(0.53, 0.17, 0.90, 1) --purple
+            elseif source[i][j] == Tetris.blocks.i then
+                target[i][j]:SetColor(0.41, 0.91, 0.93, 1) --turquoise
+            elseif source[i][j] == Tetris.blocks.z then
+                target[i][j]:SetColor(0.83, 0.18, 0.07, 1) --red
+            elseif source[i][j] == Tetris.blocks.s then
+                target[i][j]:SetColor(0.41, 0.90, 0.21, 1) --green
+            elseif source[i][j] == Tetris.blocks.o then
+                target[i][j]:SetColor(0.93, 0.92, 0.22, 1) --yellow
+            elseif source[i][j] == Tetris.blocks.none then
+                target[i][j]:SetColor(1, 1, 1, 1) --white
             end
-            Tetris.UI.background:SetColor(0,0,0,1)
+            bg:SetColor(0,0,0,1)
         end
     end
     Tetrisparams.array = deepcopy(Tetris.array)
+end
+
+
+-- Convenient function to redraw the User Interface of Tetris
+local function _drawUI()
+    _drawPixel(Tetris.array, Tetris.UI.pixel, width, height, Tetris.UI.background)
 end
 
 
@@ -221,6 +227,13 @@ local function _checkBlock()
 end
 
 
+local function _getNextBlock()
+    --math.random does not feel random in a pleasant way
+    math.randomseed(GetGameTimeMilliseconds())
+    return math.random(Tetris.blocks.j, Tetris.blocks.o)
+end
+
+
 -- Creates a new Block if possible, else it triggers "game over" state
 local function _createBlock()
 
@@ -239,15 +252,12 @@ local function _createBlock()
         typusList[typus] = 0
     -- else a random block will be played
     else
-        -- math.random does not feel random in a pleasant way
-        math.randomseed(GetGameTimeMilliseconds())
-        typus = math.random(Tetris.blocks.j, Tetris.blocks.o)
+        typus = _getNextBlock()
         for i=1,#typusList do
             typusList[i] = typusList[i] + 1
         end
         typusList[typus] = 0
     end
-
 
     -- get the Block start layout from  Moves.lua
     Tetris.Block = TetrisMoves.start(typus)
