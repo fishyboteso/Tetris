@@ -5,8 +5,10 @@ Tetris = {
     manipulations = {},
     array = {},
     blocks = {},
-    Block = {}
+    Block = {},
+    PV = TetrisPV
 }
+
 -- Struct for Block Manipulations
 Tetris.manipulations = {
     nothing = 0,
@@ -87,6 +89,8 @@ local function _setBlockToArray(typus)
     Tetris.array[Tetris.Block.c.x][Tetris.Block.c.y] = typus
     Tetris.array[Tetris.Block.d.x][Tetris.Block.d.y] = typus
 end
+
+
 
 
 -- Executes Manipulation on pixel array if possible
@@ -186,6 +190,12 @@ local function _drawUI()
 end
 
 
+-- Convenient function to redraw the Preview Interface
+local function _drawPV()
+    _drawPixel(Tetris.PV.array, Tetris.PV.UI.pixel, Tetris.PV.width, Tetris.PV.height, Tetris.PV.UI.background)
+end
+
+
 -- Checks if any more downwards moves are possible for active Block
 -- returns TRUE if down move is possible for Block
 -- else FALSE
@@ -227,10 +237,18 @@ local function _checkBlock()
 end
 
 
+-- Collects the typus of the next Block and generates the following
 local function _getNextBlock()
     --math.random does not feel random in a pleasant way
-    math.randomseed(GetGameTimeMilliseconds())
-    return math.random(Tetris.blocks.j, Tetris.blocks.o)
+    typus = Tetris.PV:getNextTypus()
+    if typus == nil then
+        math.randomseed(GetGameTimeMilliseconds())
+        typus = math.random(Tetris.blocks.j, Tetris.blocks.o)
+    else
+        _drawPV()
+    end
+
+    return typus
 end
 
 
@@ -462,6 +480,7 @@ local function _simpleEngine()
         tmpInteractableName = interactableName
         HUD_SCENE:AddFragment(Tetris.fragment)
         LOOT_SCENE:AddFragment(Tetris.fragment)
+        Tetris.PV:show()
         Tetris.running = true
         EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "tick", Tetrisparams.timeout, Tetris.tick)
     elseif action and tmpInteractableName == interactableName then
@@ -471,6 +490,7 @@ local function _simpleEngine()
         tmpInteractableName = ""
         EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
         Tetris.running = false
+        Tetris.PV:hide()
         HUD_SCENE:RemoveFragment(Tetris.fragment)
         LOOT_SCENE:RemoveFragment(Tetris.fragment)
     end
@@ -499,6 +519,7 @@ function Tetris.toggle(fishingState)
         if Tetris.running == false then
             HUD_SCENE:AddFragment(Tetris.fragment)
             LOOT_SCENE:AddFragment(Tetris.fragment)
+            Tetris.PV:show()
             Tetris.UI.labelBg:SetHidden(true)
             Tetris.running = true
             EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "tick", Tetrisparams.timeout, Tetris.tick)
@@ -518,11 +539,13 @@ function Tetris.toggle(fishingState)
         Tetris.UI.label:SetHorizontalAlignment(TEXT_ALIGN_CENTER)
         Tetris.UI.labelBg:SetHidden(false)
         HUD_SCENE:AddFragment(Tetris.fragment)
+        Tetris.PV:show()
 
     --All other Tetris.engine states stop and hide Tetris
     else
         EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
         Tetris.running = false
+        Tetris.PV:hide()
         HUD_SCENE:RemoveFragment(Tetris.fragment)
         LOOT_SCENE:RemoveFragment(Tetris.fragment)
     end
@@ -583,6 +606,11 @@ local function _createUI()
     Tetris.UI.label:SetText("TESTLABEL")
     Tetris.UI.label:SetDrawLevel(3)
     Tetris.UI.label:SetHidden(false)
+    
+    -- Create UI for Preview
+    Tetris.PV:createUI()
+    Tetris.PV:getNextTypus()
+    _drawPV()
 
     -- Setup fragment for Scene management
     Tetris.fragment = ZO_FadeSceneFragment:New(Tetris.UI, 100, 200)
