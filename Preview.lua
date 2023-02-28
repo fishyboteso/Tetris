@@ -41,6 +41,15 @@ function TetrisPV:getNextTypus()
     return typus
 end
 
+-- Return the new typus and generate the next
+function TetrisPV:setNextTypus(t)
+    typus = TetrisPV.nextTypus
+    TetrisPV.nextTypus = t
+    TetrisPV.Block = TetrisMoves.start(TetrisPV.nextTypus)
+    _setBlocktoArray()
+    return typus
+end
+
 
 function TetrisPV:show()
     if TetrisPV.enabled then

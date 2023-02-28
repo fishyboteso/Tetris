@@ -265,9 +265,10 @@ local function _createBlock()
     end
 
     -- if any Block type was not played for 13 turns, it will be played now
-    if typusList[j] > 12 then
-        typus = j
-        typusList[typus] = 0
+    if typusList[j] > 12 and j ~= Tetris.PV.nextTypus then
+        typus = Tetris.PV:setNextTypus(j)
+        _drawPV()
+        typusList[j] = 0
     -- else a random block will be played
     else
         typus = _getNextBlock()
