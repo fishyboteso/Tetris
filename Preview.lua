@@ -3,62 +3,30 @@ TetrisPV = {
     name = "TetrisPV",
     array = {},
     Block = {},
-    width = 2,
+    width = 4,
     height = 4
 }
 
---TODO copy paste
-local Tetrisdefaults = {
-    pixelsize    = 16,
-    timeout      = 500,
-    posx         = 0,
-    posy         = 0,
-    blink        = true,
-    lookingPause = false,
-    bscore = 0,
-    lscore = 0,
-    showStats = true
-}
---Struct for Block types
-TetrisPV.blocks = {
-    none = 0,
-    j = 1,
-    l = 2,
-    t = 3,
-    i = 4,
-    z = 5,
-    s = 6,
-    o = 7
-}
---TODO copy paste
-
--- Constants
-local brdr = 8
-local width = 2
-local height = 4
-
-
---local logger = LibDebugLogger(TetrisPV.name)
-
+local logger = LibDebugLogger(TetrisPV.name)
 
 -- Clear and set Block in Preview array
 local function _setBlocktoArray()
-    for i=0,width-1 do
-        for j=0,height-1 do
-            TetrisPV.array[i][j] = TetrisPV.blocks.none
+    for i=0,TetrisPV.width-1 do
+        for j=0,TetrisPV.height-1 do
+            TetrisPV.array[i][j] = Tetris.blocks.none
         end
     end
 
-    if TetrisPV.Block.typus ~= TetrisPV.blocks.i then
+    if TetrisPV.Block.typus ~= Tetris.blocks.i then
         y = 1
     else
         y = 0
     end
 
-    TetrisPV.array[TetrisPV.Block.a.x - 4][TetrisPV.Block.a.y + y] = TetrisPV.Block.typus
-    TetrisPV.array[TetrisPV.Block.b.x - 4][TetrisPV.Block.b.y + y] = TetrisPV.Block.typus
-    TetrisPV.array[TetrisPV.Block.c.x - 4][TetrisPV.Block.c.y + y] = TetrisPV.Block.typus
-    TetrisPV.array[TetrisPV.Block.d.x - 4][TetrisPV.Block.d.y + y] = TetrisPV.Block.typus
+    TetrisPV.array[TetrisPV.Block.a.x - 3][TetrisPV.Block.a.y + y] = TetrisPV.Block.typus
+    TetrisPV.array[TetrisPV.Block.b.x - 3][TetrisPV.Block.b.y + y] = TetrisPV.Block.typus
+    TetrisPV.array[TetrisPV.Block.c.x - 3][TetrisPV.Block.c.y + y] = TetrisPV.Block.typus
+    TetrisPV.array[TetrisPV.Block.d.x - 3][TetrisPV.Block.d.y + y] = TetrisPV.Block.typus
 end
 
 
@@ -88,11 +56,11 @@ end
 
 
 -- Create UI for Preview
-function TetrisPV:createUI()
-    Tetrisparams = ZO_SavedVars:NewAccountWide("Tetrisparamsvar", 1, nil, Tetrisdefaults)
+function TetrisPV:createUI(params)
 
-    dimXPV = brdr + width*Tetrisparams.pixelsize + brdr
-    dimYPV = brdr + height*Tetrisparams.pixelsize + brdr
+    dimXPV = Tetris.brdr + TetrisPV.width*params.pixelsize + Tetris.brdr
+    dimYPV = Tetris.brdr + TetrisPV.height*params.pixelsize + Tetris.brdr
+    dimX,dimY = Tetris.UI.background:GetDimensions()
 
     -- PV Toplevel
     TetrisPV.UI = WINDOW_MANAGER:CreateControl(nil, GuiRoot, CT_TOPLEVELCONTROL)
@@ -100,7 +68,7 @@ function TetrisPV:createUI()
     TetrisPV.UI:SetClampedToScreen(true)
     TetrisPV.UI:SetMovable(true)
     TetrisPV.UI:SetDimensions(dimXPV, dimYPV)
-    TetrisPV.UI:SetAnchor(TOPRIGHT, GuiRoot, TOPRIGHT, Tetrisparams.posx, Tetrisparams.posy - dimYPV)
+    TetrisPV.UI:SetAnchor(TOPRIGHT, GuiRoot, TOPRIGHT, params.posx - ((dimX - dimXPV)/2), params.posy - dimYPV)
     TetrisPV.UI:SetDrawLevel(0)
     TetrisPV.UI:SetDrawLayer(DL_MAX_VALUE-1)
     TetrisPV.UI:SetDrawTier(DT_MAX_VALUE-1)
@@ -115,15 +83,14 @@ function TetrisPV:createUI()
 
     -- Setup Preview matrix
     TetrisPV.UI.pixel = {}
-    for i=0,width-1 do
+    for i=0,TetrisPV.width-1 do
         TetrisPV.UI.pixel[i] = {}
         TetrisPV.array[i] = {}
-        for j=0,height-1 do
-            --if Tetrisparams.PV.array then TetrisPV.array[i][j] = Tetrisparams.PV.array[i][j] else TetrisPV.array[i][j] = 0 end
+        for j=0,TetrisPV.height-1 do
             TetrisPV.UI.pixel[i][j] = WINDOW_MANAGER:CreateControl(nil, TetrisPV.UI, CT_TEXTURE)
-            TetrisPV.UI.pixel[i][j]:SetDimensions(Tetrisparams.pixelsize-2, Tetrisparams.pixelsize-2)
+            TetrisPV.UI.pixel[i][j]:SetDimensions(params.pixelsize-2, params.pixelsize-2)
             TetrisPV.UI.pixel[i][j]:SetColor(1, 1, 1, 1)
-            TetrisPV.UI.pixel[i][j]:SetAnchor(TOPLEFT, TetrisPV.UI.background, TOPLEFT, brdr+1+(i*Tetrisparams.pixelsize), brdr+1+(j*Tetrisparams.pixelsize))
+            TetrisPV.UI.pixel[i][j]:SetAnchor(TOPLEFT, TetrisPV.UI.background, TOPLEFT, Tetris.brdr+1+(i*params.pixelsize), Tetris.brdr+1+(j*params.pixelsize))
             TetrisPV.UI.pixel[i][j]:SetHidden(false)
             TetrisPV.UI.pixel[i][j]:SetDrawLevel(1)
         end

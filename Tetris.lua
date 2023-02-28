@@ -6,7 +6,10 @@ Tetris = {
     array = {},
     blocks = {},
     Block = {},
-    PV = TetrisPV
+    PV = TetrisPV,
+    brdr = 8,
+    width = 10,
+    height = 20
 }
 
 -- Struct for Block Manipulations
@@ -39,26 +42,22 @@ local Tetrisdefaults = {
     posy         = 0,
     blink        = true,
     lookingPause = false,
-    bscore = 0,
-    lscore = 0,
-    showStats = true
+    bscore       = 0,
+    lscore       = 0,
+    showStats    = true,
+    array        = nil
 }
 
 -- Imports
---local logger = LibDebugLogger(Tetris.name)
+local logger = LibDebugLogger(Tetris.name)
 
 -- Maximum manipulations per tick
 local maxManipulations = { left = 5, right = 5, rotate = 4 }
 
--- Constants
-local brdr = 8
-local width = 10
-local height = 20
-
 -- Temporary variables
 local gameover = false
 local typusList = {0,0,0,0,0,0,0}
-local greyline = height-1
+local greyline = Tetris.height-1
 
 local blink = 1
 local tmpFishingState = 0
@@ -112,8 +111,8 @@ local function _execManipulation(manipulation)
 
     --check if it is outside of the grid
     --bottom
-    if Tetris.Block.a.y >= height or Tetris.Block.b.y >= height or
-       Tetris.Block.c.y >= height or Tetris.Block.d.y >= height then
+    if Tetris.Block.a.y >= Tetris.height or Tetris.Block.b.y >= Tetris.height or
+       Tetris.Block.c.y >= Tetris.height or Tetris.Block.d.y >= Tetris.height then
         Tetris.Block = deepcopy(tempBlock)
         Tetrisparams.Block = deepcopy(Tetris.Block)
 
@@ -130,8 +129,8 @@ local function _execManipulation(manipulation)
         return false
     end
     --right border
-    if Tetris.Block.a.x >= width or Tetris.Block.b.x >= width or
-       Tetris.Block.c.x >= width or Tetris.Block.d.x >= width then
+    if Tetris.Block.a.x >= Tetris.width or Tetris.Block.b.x >= Tetris.width or
+       Tetris.Block.c.x >= Tetris.width or Tetris.Block.d.x >= Tetris.width then
         Tetris.Block = deepcopy(tempBlock)
         Tetrisparams.Block = deepcopy(Tetris.Block)
 
@@ -186,7 +185,7 @@ end
 
 -- Convenient function to redraw the User Interface of Tetris
 local function _drawUI()
-    _drawPixel(Tetris.array, Tetris.UI.pixel, width, height, Tetris.UI.background)
+    _drawPixel(Tetris.array, Tetris.UI.pixel, Tetris.width, Tetris.height, Tetris.UI.background)
 end
 
 
@@ -314,7 +313,7 @@ function Tetris.gameOver()
         Tetrisparams.lscore = 0
 
         if Tetris.running == true then
-            greyline = height-1
+            greyline = Tetris.height-1
             Tetris.UI.labelBg:SetHidden(true)
             gameover = false
             _createBlock()
@@ -324,7 +323,7 @@ function Tetris.gameOver()
     end
 
     -- remove next line and timeout
-    for i=0,width-1 do
+    for i=0,Tetris.width-1 do
         Tetris.array[i][greyline] = Tetris.blocks.none
     end
     _drawUI()
@@ -386,9 +385,9 @@ local function _removeLines()
     rm = 0
 
     --bottom up
-    for j=height-1,0,-1 do
+    for j=Tetris.height-1,0,-1 do
         line = 0
-        for i=0,width-1 do
+        for i=0,Tetris.width-1 do
             --add up line
             if Tetris.array[i][j] ~= Tetris.blocks.none then
                 line = line + 1
@@ -403,8 +402,8 @@ local function _removeLines()
             end
         end
 
-        if line == width then
-            for i=0,width-1 do
+        if line == Tetris.width then
+            for i=0,Tetris.width-1 do
                 Tetris.array[i][j] = Tetris.blocks.none
             end
             rm = rm + 1
@@ -554,8 +553,8 @@ end
 
 -- Create UI elements and Fragment
 local function _createUI()
-    dimX = brdr + width*Tetrisparams.pixelsize + brdr
-    dimY = brdr + height*Tetrisparams.pixelsize + brdr
+    dimX = Tetris.brdr + Tetris.width*Tetrisparams.pixelsize + Tetris.brdr
+    dimY = Tetris.brdr + Tetris.height*Tetrisparams.pixelsize + Tetris.brdr
 
     -- UI Toplevel
     Tetris.UI = WINDOW_MANAGER:CreateControl(nil, GuiRoot, CT_TOPLEVELCONTROL)
@@ -578,15 +577,15 @@ local function _createUI()
 
     -- Setup Pixel matrix
     Tetris.UI.pixel = {}
-    for i=0,width-1 do
+    for i=0,Tetris.width-1 do
         Tetris.UI.pixel[i] = {}
         Tetris.array[i] = {}
-        for j=0,height-1 do
+        for j=0,Tetris.height-1 do
             if Tetrisparams.array then Tetris.array[i][j] = Tetrisparams.array[i][j] else Tetris.array[i][j] = 0 end
             Tetris.UI.pixel[i][j] = WINDOW_MANAGER:CreateControl(nil, Tetris.UI, CT_TEXTURE)
             Tetris.UI.pixel[i][j]:SetDimensions(Tetrisparams.pixelsize-2, Tetrisparams.pixelsize-2)
             Tetris.UI.pixel[i][j]:SetColor(1, 1, 1, 1)
-            Tetris.UI.pixel[i][j]:SetAnchor(TOPLEFT, Tetris.UI.background, TOPLEFT, brdr+1+(i*Tetrisparams.pixelsize), brdr+1+(j*Tetrisparams.pixelsize))
+            Tetris.UI.pixel[i][j]:SetAnchor(TOPLEFT, Tetris.UI.background, TOPLEFT, Tetris.brdr+1+(i*Tetrisparams.pixelsize), Tetris.brdr+1+(j*Tetrisparams.pixelsize))
             Tetris.UI.pixel[i][j]:SetHidden(false)
             Tetris.UI.pixel[i][j]:SetDrawLevel(1)
         end
@@ -608,7 +607,7 @@ local function _createUI()
     Tetris.UI.label:SetHidden(false)
     
     -- Create UI for Preview
-    Tetris.PV:createUI()
+    Tetris.PV:createUI(Tetrisparams)
     Tetris.PV:getNextTypus()
     _drawPV()
 
@@ -769,6 +768,7 @@ function Tetris.OnAddOnLoaded(event, addonName)
         EVENT_MANAGER:UnregisterForEvent(Tetris.name, EVENT_ADD_ON_LOADED)
 
         -- save/load last game
+        Tetrisparams.array = nil
         Tetrisparams = ZO_SavedVars:NewAccountWide("Tetrisparamsvar", 1, nil, Tetrisdefaults)
 
         -- strings for keybindings
