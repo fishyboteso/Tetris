@@ -45,7 +45,8 @@ local Tetrisdefaults = {
     bscore       = 0,
     lscore       = 0,
     showStats    = true,
-    array        = nil
+    array        = nil,
+    preview      = true
 }
 
 -- Imports
@@ -682,6 +683,16 @@ local function _createMenu()
             requiresReload = false
         },
         {
+            type = "checkbox",
+            name = "Show a Preview for the next Block.",
+            default = true,
+            getFunc = function() return Tetris.PV.enabled end,
+            setFunc = function(value)
+                        Tetris.PV.enabled = value
+                        Tetrisparams.preview = value
+                      end,
+        },
+        {
             type = "divider",
         },
         {
@@ -725,12 +736,14 @@ local function _createMenu()
                     pressedShow = true
                     HUD_UI_SCENE:AddFragment(Tetris.fragment)
                     Tetris.UI:SetHidden(false)
+                    TetrisPV:show()
                 elseif pressedShow == true then
                     pressedShow = false
                     Tetrisparams.posy = Tetris.UI:GetTop()
                     Tetrisparams.posx = Tetris.UI:GetRight() - GuiRoot:GetRight()
                     HUD_UI_SCENE:RemoveFragment(Tetris.fragment)
                     Tetris.UI:SetHidden(true)
+                    TetrisPV:hide()
                 end
             end,
             width = "half",

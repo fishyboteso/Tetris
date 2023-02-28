@@ -4,7 +4,8 @@ TetrisPV = {
     array = {},
     Block = {},
     width = 4,
-    height = 4
+    height = 4,
+    enabled = true
 }
 
 local logger = LibDebugLogger(TetrisPV.name)
@@ -42,9 +43,13 @@ end
 
 
 function TetrisPV:show()
-    TetrisPV.UI:SetHidden(false)
-    HUD_SCENE:AddFragment(TetrisPV.fragment)
-    LOOT_SCENE:AddFragment(TetrisPV.fragment)
+    if TetrisPV.enabled then
+        TetrisPV.UI:SetHidden(false)
+        HUD_SCENE:AddFragment(TetrisPV.fragment)
+        LOOT_SCENE:AddFragment(TetrisPV.fragment)
+    else
+        TetrisPV:hide()
+    end
 end
 
 
@@ -57,6 +62,8 @@ end
 
 -- Create UI for Preview
 function TetrisPV:createUI(params)
+
+    TetrisPV.enabled = params.preview
 
     dimXPV = Tetris.brdr + TetrisPV.width*params.pixelsize + Tetris.brdr
     dimYPV = Tetris.brdr + TetrisPV.height*params.pixelsize + Tetris.brdr
@@ -98,4 +105,8 @@ function TetrisPV:createUI(params)
     
     TetrisPV.fragment = ZO_FadeSceneFragment:New(TetrisPV.UI, 100, 200)
     TetrisPV.UI:SetHidden(true)
+
+    TetrisPV.fragment:RegisterCallback("StateChange", function()
+        TetrisPV.UI:SetAnchor(TOPRIGHT, GuiRoot, TOPRIGHT, params.posx - ((dimX - dimXPV)/2), params.posy - dimYPV)
+    end)
 end
