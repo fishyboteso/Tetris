@@ -32,18 +32,15 @@ It can integrate state machines from [fishyboteso/FishyQR](https://github.com/fi
 
 ### TODO:
 - Add a preview of the next block
-  - add Menu to enable/disable Preview
   - remove next block on "game over", generate new one on next game
   - edge cases (first start, reloadUI)
-  - SavedVar
-  - share common constants with tetris.lua
-  - show/hide respects loot scene condition
 - Pause Message when no keybindings are set
 - Add Votans Fisherman as engine
 - Improve simple engine to include blink and pause  
 - Optional increasing speed
   
 ### DONE:
+- show stats in menu
 - Better UI (animation for deleting lines and game over, fade out when hiding, blink when fish is hooked, show "game over" and "pause" label)
 - Menu options to (1) blink when hooked, (2) to pause on Chalutier.looking
 - auto detect FishyCha / Chalutier / No engine integration
