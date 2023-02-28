@@ -11,7 +11,6 @@ Tetris = {
     width = 10,
     height = 20
 }
-
 -- Struct for Block Manipulations
 Tetris.manipulations = {
     nothing = 0,
@@ -32,7 +31,6 @@ Tetris.blocks = {
     s = 6,
     o = 7
 }
-
 -- SavedVar
 local Tetrisparams = {}
 local Tetrisdefaults = {
@@ -82,6 +80,18 @@ function deepcopy(orig)
 end
 
 
+-- update score for menu
+local function _updateScore(ls, bs)
+    Tetrisparams.lscore = ls
+    Tetrisparams.bscore = bs
+
+    if TetrisStatistic then
+        TetrisStatistic.data.text = "Lines: " .. Tetrisparams.lscore .. ", Blocks: " .. Tetrisparams.bscore
+        TetrisStatistic:UpdateValue()
+    end
+end
+
+
 -- Set Block in Tetris array
 local function _setBlockToArray(typus)
     Tetris.array[Tetris.Block.a.x][Tetris.Block.a.y] = typus
@@ -89,8 +99,6 @@ local function _setBlockToArray(typus)
     Tetris.array[Tetris.Block.c.x][Tetris.Block.c.y] = typus
     Tetris.array[Tetris.Block.d.x][Tetris.Block.d.y] = typus
 end
-
-
 
 
 -- Executes Manipulation on pixel array if possible
@@ -298,7 +306,7 @@ local function _createBlock()
         _setBlockToArray(typus)
     end
 
-    Tetrisparams.bscore = Tetrisparams.bscore + 1
+    _updateScore(Tetrisparams.lscore, Tetrisparams.bscore + 1)
 
     _drawUI()
 end
@@ -311,9 +319,8 @@ function Tetris.gameOver()
 
     -- exit condition, for when all lines are removed
     if greyline == -1 then
-        Tetrisparams.bscore = 0
-        Tetrisparams.lscore = 0
-
+        _updateScore(0, 0)
+        
         if Tetris.running == true then
             greyline = Tetris.height-1
             Tetris.UI.labelBg:SetHidden(true)
@@ -412,7 +419,7 @@ local function _removeLines()
         end
     end
 
-    Tetrisparams.lscore = Tetrisparams.lscore + rm
+    _updateScore(Tetrisparams.lscore + rm, Tetrisparams.bscore )
     _drawUI()
 end
 
@@ -768,8 +775,19 @@ local function _createMenu()
             end,
             width = "half",
             requiresReload = false,
+        },
+        {
+            type = "divider",
+        },
+        {
+            type = "description",
+            title = "Statistic",
+            text = "Lines: " .. Tetrisparams.lscore .. ", Blocks: " .. Tetrisparams.bscore,
+            width = "full",
+            reference = "TetrisStatistic"
         }
     }
+
     LAM:RegisterOptionControls(panelName, optionsData)
 
 end
