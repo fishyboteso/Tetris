@@ -13,74 +13,76 @@ function TetrisMoves.start(typus)
     Block.c = {}
     Block.d = {}
 
+
+--TODO horizontal start position
     if typus == 1 then --J
-        Block.a.x = 5
+        Block.a.x = 4
         Block.a.y = 0
-        Block.b.x = 5
+        Block.b.x = 4
         Block.b.y = 1
         Block.c.x = 5
-        Block.c.y = 2
-        Block.d.x = 4
-        Block.d.y = 2
+        Block.c.y = 1
+        Block.d.x = 6
+        Block.d.y = 1
         
     elseif typus == 2 then --L
         Block.a.x = 4
-        Block.a.y = 0
-        Block.b.x = 4
+        Block.a.y = 1
+        Block.b.x = 5
         Block.b.y = 1
-        Block.c.x = 4
-        Block.c.y = 2
-        Block.d.x = 5
-        Block.d.y = 2
+        Block.c.x = 6
+        Block.c.y = 0
+        Block.d.x = 6
+        Block.d.y = 1
         
     elseif typus == 3 then --T
         Block.a.x = 4
-        Block.a.y = 0
-        Block.b.x = 4
-        Block.b.y = 1
-        Block.c.x = 4
-        Block.c.y = 2
-        Block.d.x = 5
+        Block.a.y = 1
+        Block.b.x = 5
+        Block.b.y = 0
+        Block.c.x = 5
+        Block.c.y = 1
+        Block.d.x = 6
         Block.d.y = 1
         
     elseif typus == 4 then --I
-        Block.a.x = 4
-        Block.a.y = 0
-        Block.b.x = 4
-        Block.b.y = 1
-        Block.c.x = 4
-        Block.c.y = 2
-        Block.d.x = 4
-        Block.d.y = 3
-        
-    elseif typus == 5 then --Z
-        Block.a.x = 5
-        Block.a.y = 0
-        Block.b.x = 5
-        Block.b.y = 1
-        Block.c.x = 4
-        Block.c.y = 1
-        Block.d.x = 4
-        Block.d.y = 2
-        
-    elseif typus == 6 then --S
-        Block.a.x = 4
-        Block.a.y = 0
+        Block.a.x = 3
+        Block.a.y = 1
         Block.b.x = 4
         Block.b.y = 1
         Block.c.x = 5
         Block.c.y = 1
-        Block.d.x = 5
-        Block.d.y = 2
+        Block.d.x = 6
+        Block.d.y = 1
         
-    elseif typus == 7 then --O
+    elseif typus == 5 then --Z
         Block.a.x = 4
         Block.a.y = 0
         Block.b.x = 5
         Block.b.y = 0
         Block.c.x = 5
         Block.c.y = 1
-        Block.d.x = 4
+        Block.d.x = 6
+        Block.d.y = 1
+        
+    elseif typus == 6 then --S
+        Block.a.x = 4
+        Block.a.y = 1
+        Block.b.x = 5
+        Block.b.y = 0
+        Block.c.x = 5
+        Block.c.y = 1
+        Block.d.x = 6
+        Block.d.y = 0
+        
+    elseif typus == 7 then --O
+        Block.a.x = 4
+        Block.a.y = 0
+        Block.b.x = 4
+        Block.b.y = 1
+        Block.c.x = 5
+        Block.c.y = 0
+        Block.d.x = 5
         Block.d.y = 1
     end
 
@@ -123,53 +125,51 @@ function TetrisMoves.down(Block)
 end
 
 
-
 --#######################################################
-
 function TetrisMoves.rotate(Block)
 
     if Block.typus == 1 then -- J Block
         if Block.rotation == 0 then
-            Block.a.x = Block.a.x
-            Block.a.y = Block.a.y +2
-            Block.b.x = Block.b.x -1 
-            Block.b.y = Block.b.y +1
-            Block.c.x = Block.c.x -2
-            Block.c.y = Block.c.y
+            Block.a.x = Block.a.x +2
+            Block.a.y = Block.a.y +0
+            Block.b.x = Block.b.x +1
+            Block.b.y = Block.b.y -1
+            Block.c.x = Block.c.x +0
+            Block.c.y = Block.c.y +0
             Block.d.x = Block.d.x -1 
-            Block.d.y = Block.d.y -1
+            Block.d.y = Block.d.y +1
             Block.rotation = 1
             
         elseif Block.rotation == 1 then
-            Block.a.x = Block.a.x -2
-            Block.a.y = Block.a.y 
-            Block.b.x = Block.b.x -1
-            Block.b.y = Block.b.y -1
-            Block.c.x = Block.c.x
-            Block.c.y = Block.c.y -2
-            Block.d.x = Block.d.x +1
+            Block.a.x = Block.a.x +0
+            Block.a.y = Block.a.y +2 
+            Block.b.x = Block.b.x +1
+            Block.b.y = Block.b.y +1
+            Block.c.x = Block.c.x +0
+            Block.c.y = Block.c.y +0
+            Block.d.x = Block.d.x -1
             Block.d.y = Block.d.y -1
             Block.rotation = 2
             
         elseif Block.rotation == 2 then
-            Block.a.x = Block.a.x
-            Block.a.y = Block.a.y -2
-            Block.b.x = Block.b.x +1
-            Block.b.y = Block.b.y -1
-            Block.c.x = Block.c.x +2
-            Block.c.y = Block.c.y
+            Block.a.x = Block.a.x -2
+            Block.a.y = Block.a.y +0
+            Block.b.x = Block.b.x -1
+            Block.b.y = Block.b.y +1
+            Block.c.x = Block.c.x +0
+            Block.c.y = Block.c.y +0
             Block.d.x = Block.d.x +1
-            Block.d.y = Block.d.y +1
+            Block.d.y = Block.d.y -1
             Block.rotation = 3
             
         elseif Block.rotation == 3 then
-            Block.a.x = Block.a.x +2
-            Block.a.y = Block.a.y
-            Block.b.x = Block.b.x +1
-            Block.b.y = Block.b.y +1
-            Block.c.x = Block.c.x
-            Block.c.y = Block.c.y +2
-            Block.d.x = Block.d.x -1
+            Block.a.x = Block.a.x +0
+            Block.a.y = Block.a.y -2
+            Block.b.x = Block.b.x -1
+            Block.b.y = Block.b.y -1
+            Block.c.x = Block.c.x +0
+            Block.c.y = Block.c.y +0
+            Block.d.x = Block.d.x +1
             Block.d.y = Block.d.y +1
             Block.rotation = 0
         end
@@ -179,46 +179,46 @@ function TetrisMoves.rotate(Block)
 
     if Block.typus == 2 then -- L Block
         if Block.rotation == 0 then
-            Block.a.x = Block.a.x +2
-            Block.a.y = Block.a.y
-            Block.b.x = Block.b.x +1
-            Block.b.y = Block.b.y -1
-            Block.c.x = Block.c.x
-            Block.c.y = Block.c.y -2
+            Block.a.x = Block.a.x +1
+            Block.a.y = Block.a.y -1
+            Block.b.x = Block.b.x +0
+            Block.b.y = Block.b.y +0
+            Block.c.x = Block.c.x +0
+            Block.c.y = Block.c.y +2
             Block.d.x = Block.d.x -1
-            Block.d.y = Block.d.y -1
+            Block.d.y = Block.d.y +1
             Block.rotation = 1
             
         elseif Block.rotation == 1 then
-            Block.a.x = Block.a.x
-            Block.a.y = Block.a.y +2
-            Block.b.x = Block.b.x +1
-            Block.b.y = Block.b.y +1
-            Block.c.x = Block.c.x +2
-            Block.c.y = Block.c.y
-            Block.d.x = Block.d.x +1
+            Block.a.x = Block.a.x +1
+            Block.a.y = Block.a.y +1
+            Block.b.x = Block.b.x +0
+            Block.b.y = Block.b.y +0
+            Block.c.x = Block.c.x -2
+            Block.c.y = Block.c.y +0
+            Block.d.x = Block.d.x -1
             Block.d.y = Block.d.y -1
             Block.rotation = 2
             
         elseif Block.rotation == 2 then
-            Block.a.x = Block.a.x -2
-            Block.a.y = Block.a.y
-            Block.b.x = Block.b.x -1
-            Block.b.y = Block.b.y +1
-            Block.c.x = Block.c.x
-            Block.c.y = Block.c.y +2
+            Block.a.x = Block.a.x -1
+            Block.a.y = Block.a.y +1
+            Block.b.x = Block.b.x +0
+            Block.b.y = Block.b.y +0
+            Block.c.x = Block.c.x +0
+            Block.c.y = Block.c.y -2
             Block.d.x = Block.d.x +1
-            Block.d.y = Block.d.y +1
+            Block.d.y = Block.d.y -1
             Block.rotation = 3
             
         elseif Block.rotation == 3 then
-            Block.a.x = Block.a.x
-            Block.a.y = Block.a.y -2
-            Block.b.x = Block.b.x -1
-            Block.b.y = Block.b.y -1
-            Block.c.x = Block.c.x -2
-            Block.c.y = Block.c.y
-            Block.d.x = Block.d.x -1
+            Block.a.x = Block.a.x -1
+            Block.a.y = Block.a.y -1
+            Block.b.x = Block.b.x +0
+            Block.b.y = Block.b.y +0
+            Block.c.x = Block.c.x +2
+            Block.c.y = Block.c.y +0
+            Block.d.x = Block.d.x +1
             Block.d.y = Block.d.y +1
             Block.rotation = 0
         end
@@ -227,94 +227,94 @@ function TetrisMoves.rotate(Block)
     
     if Block.typus == 3 then -- T Block
         if Block.rotation == 0 then
-            Block.a.x = Block.a.x +2
-            Block.a.y = Block.a.y
+            Block.a.x = Block.a.x +1
+            Block.a.y = Block.a.y -1
             Block.b.x = Block.b.x +1
-            Block.b.y = Block.b.y -1
-            Block.c.x = Block.c.x
-            Block.c.y = Block.c.y -2
-            Block.d.x = Block.d.x
-            Block.d.y = Block.d.y
+            Block.b.y = Block.b.y +1
+            Block.c.x = Block.c.x +0
+            Block.c.y = Block.c.y +0
+            Block.d.x = Block.d.x -1
+            Block.d.y = Block.d.y +1
             Block.rotation = 1
             
         elseif Block.rotation == 1 then
-            Block.a.x = Block.a.x
-            Block.a.y = Block.a.y +2
-            Block.b.x = Block.b.x +1
+            Block.a.x = Block.a.x +1
+            Block.a.y = Block.a.y +1
+            Block.b.x = Block.b.x -1
             Block.b.y = Block.b.y +1
-            Block.c.x = Block.c.x +2
-            Block.c.y = Block.c.y
-            Block.d.x = Block.d.x
-            Block.d.y = Block.d.y
+            Block.c.x = Block.c.x +0
+            Block.c.y = Block.c.y +0
+            Block.d.x = Block.d.x -1
+            Block.d.y = Block.d.y -1
             Block.rotation = 2
             
         elseif Block.rotation == 2 then
-            Block.a.x = Block.a.x -2
-            Block.a.y = Block.a.y
+            Block.a.x = Block.a.x -1
+            Block.a.y = Block.a.y +1
             Block.b.x = Block.b.x -1
-            Block.b.y = Block.b.y +1
-            Block.c.x = Block.c.x
-            Block.c.y = Block.c.y +2
-            Block.d.x = Block.d.x
-            Block.d.y = Block.d.y
+            Block.b.y = Block.b.y -1
+            Block.c.x = Block.c.x +0
+            Block.c.y = Block.c.y +0
+            Block.d.x = Block.d.x +1
+            Block.d.y = Block.d.y -1
             Block.rotation = 3
             
         elseif Block.rotation == 3 then
-            Block.a.x = Block.a.x
-            Block.a.y = Block.a.y -2
-            Block.b.x = Block.b.x -1
+            Block.a.x = Block.a.x -1
+            Block.a.y = Block.a.y -1
+            Block.b.x = Block.b.x +1
             Block.b.y = Block.b.y -1
-            Block.c.x = Block.c.x -2
-            Block.c.y = Block.c.y
-            Block.d.x = Block.d.x
-            Block.d.y = Block.d.y
+            Block.c.x = Block.c.x +0
+            Block.c.y = Block.c.y +0
+            Block.d.x = Block.d.x +1
+            Block.d.y = Block.d.y +1
             Block.rotation = 0
         end
     end
     
-    if Block.typus == 4 then -- I Block        
+    if Block.typus == 4 then -- I Block    
         if Block.rotation == 0 then
-            Block.a.x = Block.a.x +3
-            Block.a.y = Block.a.y
-            Block.b.x = Block.b.x +2
-            Block.b.y = Block.b.y -1
-            Block.c.x = Block.c.x +1
-            Block.c.y = Block.c.y -2
-            Block.d.x = Block.d.x
-            Block.d.y = Block.d.y -3
+            Block.a.x = Block.a.x +2
+            Block.a.y = Block.a.y -1
+            Block.b.x = Block.b.x +1
+            Block.b.y = Block.b.y +0
+            Block.c.x = Block.c.x +0
+            Block.c.y = Block.c.y +1
+            Block.d.x = Block.d.x -1
+            Block.d.y = Block.d.y +2
             Block.rotation = 1
             
         elseif Block.rotation == 1 then
-            Block.a.x = Block.a.x
-            Block.a.y = Block.a.y +3
-            Block.b.x = Block.b.x +1
-            Block.b.y = Block.b.y +2
-            Block.c.x = Block.c.x +2
-            Block.c.y = Block.c.y +1
-            Block.d.x = Block.d.x +3
-            Block.d.y = Block.d.y
+            Block.a.x = Block.a.x +1
+            Block.a.y = Block.a.y +2
+            Block.b.x = Block.b.x +0
+            Block.b.y = Block.b.y +1
+            Block.c.x = Block.c.x -1
+            Block.c.y = Block.c.y +0
+            Block.d.x = Block.d.x -2
+            Block.d.y = Block.d.y -1
             Block.rotation = 2
             
         elseif Block.rotation == 2 then
-            Block.a.x = Block.a.x -3
-            Block.a.y = Block.a.y
-            Block.b.x = Block.b.x -2
-            Block.b.y = Block.b.y +1
-            Block.c.x = Block.c.x -1
-            Block.c.y = Block.c.y +2
-            Block.d.x = Block.d.x
-            Block.d.y = Block.d.y +3
+            Block.a.x = Block.a.x -2
+            Block.a.y = Block.a.y +1
+            Block.b.x = Block.b.x -1
+            Block.b.y = Block.b.y +0
+            Block.c.x = Block.c.x +0
+            Block.c.y = Block.c.y -1
+            Block.d.x = Block.d.x +1
+            Block.d.y = Block.d.y -2
             Block.rotation = 3
             
         elseif Block.rotation == 3 then
-            Block.a.x = Block.a.x
-            Block.a.y = Block.a.y -3
-            Block.b.x = Block.b.x -1
-            Block.b.y = Block.b.y -2
-            Block.c.x = Block.c.x -2
-            Block.c.y = Block.c.y -1
-            Block.d.x = Block.d.x -3
-            Block.d.y = Block.d.y
+            Block.a.x = Block.a.x -1
+            Block.a.y = Block.a.y -2
+            Block.b.x = Block.b.x +0
+            Block.b.y = Block.b.y -1
+            Block.c.x = Block.c.x +1
+            Block.c.y = Block.c.y +0
+            Block.d.x = Block.d.x +2
+            Block.d.y = Block.d.y +1
             Block.rotation = 0
         end
     end
@@ -322,47 +322,47 @@ function TetrisMoves.rotate(Block)
     if Block.typus == 5 then -- Z Block
         
         if Block.rotation == 0 then
-            Block.a.x = Block.a.x +1
-            Block.a.y = Block.a.y +1
-            Block.b.x = Block.b.x
-            Block.b.y = Block.b.y
-            Block.c.x = Block.c.x +1
-            Block.c.y = Block.c.y -1
-            Block.d.x = Block.d.x
-            Block.d.y = Block.d.y -2
+            Block.a.x = Block.a.x +2
+            Block.a.y = Block.a.y +0
+            Block.b.x = Block.b.x +1
+            Block.b.y = Block.b.y +1
+            Block.c.x = Block.c.x +0
+            Block.c.y = Block.c.y +0
+            Block.d.x = Block.d.x -1
+            Block.d.y = Block.d.y +1
             Block.rotation = 1
             
         elseif Block.rotation == 1 then
-            Block.a.x = Block.a.x -1
-            Block.a.y = Block.a.y +1
-            Block.b.x = Block.b.x
-            Block.b.y = Block.b.y
-            Block.c.x = Block.c.x +1
-            Block.c.y = Block.c.y +1
-            Block.d.x = Block.d.x +2
-            Block.d.y = Block.d.y
+            Block.a.x = Block.a.x +0
+            Block.a.y = Block.a.y +2
+            Block.b.x = Block.b.x -1
+            Block.b.y = Block.b.y +1
+            Block.c.x = Block.c.x +0
+            Block.c.y = Block.c.y +0
+            Block.d.x = Block.d.x -1
+            Block.d.y = Block.d.y -1
             Block.rotation = 2
                     
         elseif Block.rotation == 2 then
-            Block.a.x = Block.a.x -1
-            Block.a.y = Block.a.y -1
-            Block.b.x = Block.b.x
-            Block.b.y = Block.b.y
-            Block.c.x = Block.c.x -1
-            Block.c.y = Block.c.y +1
-            Block.d.x = Block.d.x
-            Block.d.y = Block.d.y +2
+            Block.a.x = Block.a.x -2
+            Block.a.y = Block.a.y +0
+            Block.b.x = Block.b.x -1
+            Block.b.y = Block.b.y -1
+            Block.c.x = Block.c.x +0
+            Block.c.y = Block.c.y +0
+            Block.d.x = Block.d.x +1
+            Block.d.y = Block.d.y -1
             Block.rotation = 3
             
         elseif Block.rotation == 3 then
-            Block.a.x = Block.a.x +1
-            Block.a.y = Block.a.y -1
-            Block.b.x = Block.b.x
-            Block.b.y = Block.b.y
-            Block.c.x = Block.c.x -1
-            Block.c.y = Block.c.y -1
-            Block.d.x = Block.d.x -2
-            Block.d.y = Block.d.y
+            Block.a.x = Block.a.x +0
+            Block.a.y = Block.a.y -2
+            Block.b.x = Block.b.x +1
+            Block.b.y = Block.b.y -1
+            Block.c.x = Block.c.x +0
+            Block.c.y = Block.c.y +0
+            Block.d.x = Block.d.x +1
+            Block.d.y = Block.d.y +1
             Block.rotation = 0
         end
     end
@@ -371,46 +371,46 @@ function TetrisMoves.rotate(Block)
         
         if Block.rotation == 0 then
             Block.a.x = Block.a.x +1
-            Block.a.y = Block.a.y +1
-            Block.b.x = Block.b.x
-            Block.b.y = Block.b.y
-            Block.c.x = Block.c.x -1
-            Block.c.y = Block.c.y +1
-            Block.d.x = Block.d.x -2
-            Block.d.y = Block.d.y
+            Block.a.y = Block.a.y -1
+            Block.b.x = Block.b.x +1
+            Block.b.y = Block.b.y +1
+            Block.c.x = Block.c.x +0
+            Block.c.y = Block.c.y +0
+            Block.d.x = Block.d.x +0
+            Block.d.y = Block.d.y +2
             Block.rotation = 1
             
         elseif Block.rotation == 1 then
-            Block.a.x = Block.a.x -1
+            Block.a.x = Block.a.x +1
             Block.a.y = Block.a.y +1
-            Block.b.x = Block.b.x
-            Block.b.y = Block.b.y
-            Block.c.x = Block.c.x -1
-            Block.c.y = Block.c.y -1
-            Block.d.x = Block.d.x
-            Block.d.y = Block.d.y -2
+            Block.b.x = Block.b.x -1
+            Block.b.y = Block.b.y +1
+            Block.c.x = Block.c.x +0
+            Block.c.y = Block.c.y +0
+            Block.d.x = Block.d.x -2
+            Block.d.y = Block.d.y +0
             Block.rotation = 2
                             
         elseif Block.rotation == 2 then
             Block.a.x = Block.a.x -1
-            Block.a.y = Block.a.y -1
-            Block.b.x = Block.b.x
-            Block.b.y = Block.b.y
-            Block.c.x = Block.c.x +1
-            Block.c.y = Block.c.y -1
-            Block.d.x = Block.d.x +2
-            Block.d.y = Block.d.y
+            Block.a.y = Block.a.y +1
+            Block.b.x = Block.b.x -1
+            Block.b.y = Block.b.y -1
+            Block.c.x = Block.c.x +0
+            Block.c.y = Block.c.y +0
+            Block.d.x = Block.d.x +0
+            Block.d.y = Block.d.y -2
             Block.rotation = 3
             
         elseif Block.rotation == 3 then
-            Block.a.x = Block.a.x +1
+            Block.a.x = Block.a.x -1
             Block.a.y = Block.a.y -1
-            Block.b.x = Block.b.x
-            Block.b.y = Block.b.y
-            Block.c.x = Block.c.x +1
-            Block.c.y = Block.c.y +1
-            Block.d.x = Block.d.x
-            Block.d.y = Block.d.y +2
+            Block.b.x = Block.b.x +1
+            Block.b.y = Block.b.y -1
+            Block.c.x = Block.c.x +0
+            Block.c.y = Block.c.y +0
+            Block.d.x = Block.d.x +2
+            Block.d.y = Block.d.y +0
             Block.rotation = 0
         end
     end
