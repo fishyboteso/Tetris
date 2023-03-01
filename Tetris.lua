@@ -250,7 +250,6 @@ local function _getNextBlock()
     --math.random does not feel random in a pleasant way
     typus = Tetris.PV:getNextTypus()
     if typus == nil then
-        math.randomseed(GetGameTimeMilliseconds())
         typus = math.random(Tetris.blocks.j, Tetris.blocks.o)
     else
         _drawPV()
@@ -294,6 +293,10 @@ local function _createBlock()
     if not _checkMoves() or not _checkBlock() then
         EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
         gameover = true
+
+        TetrisPV:hide()
+        _getNextBlock()
+
         if Tetrisparams.showStats == true then
             Tetris.UI.label:SetText("GAME OVER\nLines removed: " .. Tetrisparams.lscore .. "\nBlocks spawned: " .. Tetrisparams.bscore)
         else
@@ -312,10 +315,18 @@ local function _createBlock()
 end
 
 
+function cleanUpRandom()
+    math.randomseed(GetGameTimeMilliseconds())
+    math.random(0, math.random(3,7))
+end
+
+
 -- "Game over" state control and animation
 function Tetris.gameOver()
     EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "gameover")
     EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
+
+    cleanUpRandom()
 
     -- exit condition, for when all lines are removed
     if greyline == -1 then
@@ -325,6 +336,7 @@ function Tetris.gameOver()
             greyline = Tetris.height-1
             Tetris.UI.labelBg:SetHidden(true)
             gameover = false
+            TetrisPV:show()
             _createBlock()
             EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "tick", Tetrisparams.timeout, Tetris.tick)
             return
@@ -346,11 +358,13 @@ end
 -- Slam timeout to allow one more manipulation after slam
 local function _slam()
     EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "slam")
+    slamed = false
     Tetris.tick()
 end
 
 
 -- Manipulate active Block (left,right,rotate,slam)
+slamed = false
 local function _manipulate(manipulation)
     if Tetris.running == false then
         return false
@@ -364,8 +378,13 @@ local function _manipulate(manipulation)
             result = _execManipulation(Tetris.manipulations.down)
         end
 
-        -- slam timeout to allow one more manipulation after slam
-        EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "slam", 250, _slam)
+        if not slamed then
+            -- slam timeout to allow one more manipulation after slam
+            EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "slam", 250, _slam)
+            slamed = true
+        else
+            _slam()
+        end
 
     elseif manipulation == Tetris.manipulations.down then
         result = _execManipulation(manipulation)
@@ -530,6 +549,7 @@ function Tetris.toggle(fishingState)
             Tetris.PV:show()
             Tetris.UI.labelBg:SetHidden(true)
             Tetris.running = true
+            cleanUpRandom()
             EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "tick", Tetrisparams.timeout, Tetris.tick)
         end
 
@@ -547,7 +567,7 @@ function Tetris.toggle(fishingState)
         Tetris.UI.label:SetHorizontalAlignment(TEXT_ALIGN_CENTER)
         Tetris.UI.labelBg:SetHidden(false)
         HUD_SCENE:AddFragment(Tetris.fragment)
-        Tetris.PV:show()
+        Tetris.PV:hide()
 
     --All other Tetris.engine states stop and hide Tetris
     else

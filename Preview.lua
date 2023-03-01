@@ -34,7 +34,6 @@ end
 -- Return the new typus and generate the next
 function TetrisPV:getNextTypus()
     typus = TetrisPV.nextTypus
-    math.randomseed(GetGameTimeMilliseconds())
     TetrisPV.nextTypus = math.random(Tetris.blocks.j, Tetris.blocks.o)
     TetrisPV.Block = TetrisMoves.start(TetrisPV.nextTypus)
     _setBlocktoArray()
