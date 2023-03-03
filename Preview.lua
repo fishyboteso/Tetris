@@ -3,6 +3,7 @@ TetrisPV = {
     name = "TetrisPV",
     array = {},
     Block = {},
+    bag = {},
     width = 4,
     height = 4,
     enabled = true
@@ -31,19 +32,31 @@ local function _setBlocktoArray()
 end
 
 
--- Return the new typus and generate the next
-function TetrisPV:getNextTypus()
-    typus = TetrisPV.nextTypus
-    TetrisPV.nextTypus = math.random(Tetris.blocks.j, Tetris.blocks.o)
-    TetrisPV.Block = TetrisMoves.start(TetrisPV.nextTypus)
-    _setBlocktoArray()
-    return typus
+-- shuffle the bag
+local function _shuffleBag()
+  local bag = {Tetris.blocks.i, Tetris.blocks.t, Tetris.blocks.l,
+    Tetris.blocks.j, Tetris.blocks.s, Tetris.blocks.z, Tetris.blocks.o}
+  for i = #bag, 2, -1 do
+    local j = math.random(i)
+    bag[i], bag[j] = bag[j], bag[i]
+  end
+  return bag
 end
 
--- Return the new typus and generate the next
-function TetrisPV:setNextTypus(t)
+
+-- Define a function to pop one item from the bag
+function TetrisPV:getNextTypus()
+    -- Regenerate and shuffle the bag if it's empty
+    if #TetrisPV.bag == 0 then
+        logger:Warn("Shuffle")
+        TetrisPV.bag = _shuffleBag()
+    end
+    -- Pop one item from the bag and return its corresponding number
+    local tetromino = table.remove(TetrisPV.bag)
+    logger:Warn(tetromino, TetrisPV.bag)
+
     typus = TetrisPV.nextTypus
-    TetrisPV.nextTypus = t
+    TetrisPV.nextTypus = tetromino
     TetrisPV.Block = TetrisMoves.start(TetrisPV.nextTypus)
     _setBlocktoArray()
     return typus

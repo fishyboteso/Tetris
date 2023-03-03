@@ -55,7 +55,6 @@ local maxManipulations = { left = 5, right = 5, rotate = 4 }
 
 -- Temporary variables
 local gameover = false
-local typusList = {0,0,0,0,0,0,0}
 local greyline = Tetris.height-1
 
 local blink = 1
@@ -79,7 +78,7 @@ function deepcopy(orig)
     return copy
 end
 
-
+-- TODO makes sure score is taken from savedvar
 -- update score for menu
 local function _updateScore(ls, bs)
     Tetrisparams.lscore = ls
@@ -261,31 +260,8 @@ end
 
 -- Creates a new Block if possible, else it triggers "game over" state
 local function _createBlock()
-
-    -- complicated way to make sure that every Block type comes at least every 13th turn
-    -- typuslist holds a counter for each block type
-    j = 1
-    for i=1,#typusList do
-        if typusList[j] <= typusList[i] then
-            j = i
-        end
-    end
-
-    -- if any Block type was not played for 13 turns, it will be played now
-    if typusList[j] > 12 and j ~= Tetris.PV.nextTypus then
-        typus = Tetris.PV:setNextTypus(j)
-        _drawPV()
-        typusList[j] = 0
-    -- else a random block will be played
-    else
-        typus = _getNextBlock()
-        for i=1,#typusList do
-            typusList[i] = typusList[i] + 1
-        end
-        typusList[typus] = 0
-    end
-
     -- get the Block start layout from  Moves.lua
+    typus = _getNextBlock()
     Tetris.Block = TetrisMoves.start(typus)
     Tetrisparams.Block = deepcopy(Tetris.Block)
 
@@ -294,9 +270,9 @@ local function _createBlock()
         EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
         gameover = true
 
-        TetrisPV:hide()
-        _getNextBlock()
-
+        Tetris.PV:hide()
+        Tetris.PV.bag={}
+        
         if Tetrisparams.showStats == true then
             Tetris.UI.label:SetText("GAME OVER\nLines removed: " .. Tetrisparams.lscore .. "\nBlocks spawned: " .. Tetrisparams.bscore)
         else
@@ -336,7 +312,7 @@ function Tetris.gameOver()
             greyline = Tetris.height-1
             Tetris.UI.labelBg:SetHidden(true)
             gameover = false
-            TetrisPV:show()
+            Tetris.PV:show()
             _createBlock()
             EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "tick", Tetrisparams.timeout, Tetris.tick)
             return
@@ -764,14 +740,14 @@ local function _createMenu()
                     pressedShow = true
                     HUD_UI_SCENE:AddFragment(Tetris.fragment)
                     Tetris.UI:SetHidden(false)
-                    TetrisPV:show()
+                    Tetris.PV:show()
                 elseif pressedShow == true then
                     pressedShow = false
                     Tetrisparams.posy = Tetris.UI:GetTop()
                     Tetrisparams.posx = Tetris.UI:GetRight() - GuiRoot:GetRight()
                     HUD_UI_SCENE:RemoveFragment(Tetris.fragment)
                     Tetris.UI:SetHidden(true)
-                    TetrisPV:hide()
+                    Tetris.PV:hide()
                 end
             end,
             width = "half",
