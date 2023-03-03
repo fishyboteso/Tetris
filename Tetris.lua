@@ -503,6 +503,25 @@ end
 -- Toggle Tetris running state and visibility
 function Tetris.toggle(fishingState)
 
+    -- pause tetris, if some keybinds are not set
+    if  ZO_Keybindings_GetHighestPriorityBindingStringFromAction("TETRISLEFT", KEYBIND_TEXT_OPTIONS_FULL_NAME) == nil or
+        ZO_Keybindings_GetHighestPriorityBindingStringFromAction("TETRISRIGHT", KEYBIND_TEXT_OPTIONS_FULL_NAME) == nil or
+        ZO_Keybindings_GetHighestPriorityBindingStringFromAction("TETRISROTATE", KEYBIND_TEXT_OPTIONS_FULL_NAME) == nil or
+        ZO_Keybindings_GetHighestPriorityBindingStringFromAction("TETRISSLAM", KEYBIND_TEXT_OPTIONS_FULL_NAME) == nil then
+            EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
+            Tetris.running = false
+            Tetris.UI.label:SetText("You have\nunassigned Keybinds\n\nGo to controls\nand enter Tetris keys")
+            Tetris.UI.label:SetHorizontalAlignment(TEXT_ALIGN_CENTER)
+            Tetris.UI.labelBg:SetHidden(false)
+            Tetris.UI.labelBg:SetDimensions(200, 200)
+            Tetris.PV:hide()
+            HUD_SCENE:AddFragment(Tetris.fragment)
+            LOOT_SCENE:AddFragment(Tetris.fragment)
+    else
+            Tetris.UI.labelBg:SetHidden(true)
+            Tetris.UI.labelBg:SetDimensions(200, 100)
+    end
+
     --simple engine if no Chalutier engine is available
     if not Tetris.engine then
         _simpleEngine()
