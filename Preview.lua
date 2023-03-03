@@ -9,7 +9,7 @@ TetrisPV = {
     enabled = true
 }
 
-local logger = LibDebugLogger(TetrisPV.name)
+--local logger = LibDebugLogger(TetrisPV.name)
 
 -- Clear and set Block in Preview array
 local function _setBlocktoArray()
@@ -48,12 +48,10 @@ end
 function TetrisPV:getNextTypus()
     -- Regenerate and shuffle the bag if it's empty
     if #TetrisPV.bag == 0 then
-        logger:Warn("Shuffle")
         TetrisPV.bag = _shuffleBag()
     end
     -- Pop one item from the bag and return its corresponding number
     local tetromino = table.remove(TetrisPV.bag)
-    logger:Warn(tetromino, TetrisPV.bag)
 
     typus = TetrisPV.nextTypus
     TetrisPV.nextTypus = tetromino

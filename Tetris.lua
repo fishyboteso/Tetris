@@ -48,7 +48,7 @@ local Tetrisdefaults = {
 }
 
 -- Imports
-local logger = LibDebugLogger(Tetris.name)
+--local logger = LibDebugLogger(Tetris.name)
 
 -- Maximum manipulations per tick
 local maxManipulations = { left = 5, right = 5, rotate = 4 }
@@ -78,7 +78,7 @@ function deepcopy(orig)
     return copy
 end
 
--- TODO makes sure score is taken from savedvar
+
 -- update score for menu
 local function _updateScore(ls, bs)
     Tetrisparams.lscore = ls
@@ -272,7 +272,7 @@ local function _createBlock()
 
         Tetris.PV:hide()
         Tetris.PV.bag={}
-        
+
         if Tetrisparams.showStats == true then
             Tetris.UI.label:SetText("GAME OVER\nLines removed: " .. Tetrisparams.lscore .. "\nBlocks spawned: " .. Tetrisparams.bscore)
         else
@@ -477,8 +477,7 @@ end
 
 local function _simpleEngine()
     local action, interactableName, _, _, additionalInfo = GetGameCameraInteractableActionInfo()
-    if additionalInfo == ADDITIONAL_INTERACT_INFO_FISHING_NODE and
-       tmpFishingState == 0 then
+    if additionalInfo == ADDITIONAL_INTERACT_INFO_FISHING_NODE and tmpFishingState == 0 then
         tmpFishingState = 1
         tmpInteractableName = interactableName
         HUD_SCENE:AddFragment(Tetris.fragment)
@@ -487,8 +486,7 @@ local function _simpleEngine()
         Tetris.running = true
         EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "tick", Tetrisparams.timeout, Tetris.tick)
     elseif action and tmpInteractableName == interactableName then
-    elseif additionalInfo ~= ADDITIONAL_INTERACT_INFO_FISHING_NODE and
-           tmpFishingState == 1 then
+    elseif additionalInfo ~= ADDITIONAL_INTERACT_INFO_FISHING_NODE and tmpFishingState == 1 then
         tmpFishingState = 0
         tmpInteractableName = ""
         EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
