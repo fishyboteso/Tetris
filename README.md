@@ -30,17 +30,34 @@ It can integrate state machines from [fishyboteso/FishyQR](https://github.com/fi
 ## Showcase on Youtube
 [![Play Tetris while fishing in Elderscrolls Online](https://img.youtube.com/vi/Qh1E58Fy0AQ/0.jpg)]( https://www.youtube.com/watch?v=Qh1E58Fy0AQ)
 
+### Open for 1.5:
+- fix "pause / no keybinds / gameover"-Overlay edge cases
+- place last tetromino OR implement field size 10x22
+- Counter Clock Rotation
+
 ### TODO:
-- Add a preview of the next block
-  - remove next block on "game over", generate new one on next game
-  - edge cases (first start, reloadUI)
-- Pause Message when no keybindings are set
 - Add Votans Fisherman as engine
 - Improve simple engine to include blink and pause  
-- Optional increasing speed
+- Optional increase speed
+- Implement Guidelines:
+  - virtual field size 10x22
+  - Start above playfield
+  - rename blocks -> tetrominos/pieces
+  - wallkicks
+  - ghost piece OR guide lines
+  - lock down time 500 ms
+  - Delayed Auto Shift
+- Improve Score
   
-### DONE:
+### Changelog:
+**1.5:**
+- Pause Message when no keybindings are set
+- Fix Random (7bag)
+- Fix moves (SRS) and start rotation
+- Add a preview of the next block
 - show stats in menu
+
+**1.4:**
 - Better UI (animation for deleting lines and game over, fade out when hiding, blink when fish is hooked, show "game over" and "pause" label)
 - Menu options to (1) blink when hooked, (2) to pause on Chalutier.looking
 - auto detect FishyCha / Chalutier / No engine integration
