@@ -19,38 +19,34 @@ It can integrate state machines from [fishyboteso/FishyQR](https://github.com/fi
 - Set up **keybindings** for Tetris in the game
   
 ## Tetris UI
-![Tetris UI](https://user-images.githubusercontent.com/1882648/155900436-f03e868b-24eb-4d86-a2ee-7af97fbc06fb.png)  
+![Tetris UI](https://user-images.githubusercontent.com/1882648/227217532-5927eec9-8d98-4516-98d2-479180f3c9ef.png)
   
 ## Tetris Menu
-![Tetris menu](https://user-images.githubusercontent.com/1882648/155891942-7ce959ea-8ca9-4ea4-8cf2-8ada38f67e91.png)  
+![Tetris menu](https://user-images.githubusercontent.com/1882648/227217868-4aebe803-a644-48df-aa68-e9ee60811f9f.png)
   
 ## Tetris Keybindings
-![Tetris Controls](https://user-images.githubusercontent.com/1882648/155709898-33faba93-ea3c-45ff-8464-74055959a0cb.png)  
+![Tetris Controls](https://user-images.githubusercontent.com/1882648/227218054-3f975f30-9839-4519-8698-7d61fd5fbd26.png)
+
 
 ## Showcase on Youtube
 [![Play Tetris while fishing in Elderscrolls Online](https://img.youtube.com/vi/Qh1E58Fy0AQ/0.jpg)]( https://www.youtube.com/watch?v=Qh1E58Fy0AQ)
 
-### Open for 1.5:
-- fix "pause / no keybinds / gameover"-Overlay edge cases
-- place last tetromino OR implement field size 10x22
-- Counter Clock Rotation
-
-### TODO:
-- Add Votans Fisherman as engine
-- Improve simple engine to include blink and pause  
+### Open for 1.6:
 - Optional increase speed
 - Implement Guidelines:
-  - virtual field size 10x22
-  - Start above playfield
   - rename blocks -> tetrominos/pieces
   - wallkicks
   - ghost piece OR guide lines
-  - lock down time 500 ms
   - Delayed Auto Shift
 - Improve Score
+- Fix random game over bug
   
 ### Changelog:
 **1.5:**
+- fix game over bugs
+- lock down time 500 ms
+- Start above playfield
+- Add TetrisCha engine
 - Pause Message when no keybindings are set
 - Fix Random (7bag)
 - Fix moves (SRS) and start rotation
