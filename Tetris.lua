@@ -259,6 +259,26 @@ local function _getNextBlock()
 end
 
 
+local function _showMessagePopup(messageText, dimx, dimy, pause)
+    if pause then
+        Tetris.running = false
+    end
+    Tetris.UI.label:SetText(messageText)
+    Tetris.UI.label:SetHorizontalAlignment(TEXT_ALIGN_CENTER)
+    Tetris.UI.labelBg:SetDimensions(dimx, dimy)
+    Tetris.UI.labelBg:SetHidden(false)
+end
+
+
+local function _hideMessagePopup(pause)
+    Tetris.UI.labelBg:SetHidden(true)
+    Tetris.UI.label:SetText("")
+    Tetris.UI.labelBg:SetDimensions(200, 100)
+    if pause then
+        Tetris.running = true
+    end
+end
+
 -- Creates a new Block if possible, else it triggers "game over" state
 local function _createBlock()
     -- get the Block start layout from  Moves.lua
@@ -275,12 +295,10 @@ local function _createBlock()
         Tetris.PV.bag={}
 
         if Tetrisparams.showStats == true then
-            Tetris.UI.label:SetText("GAME OVER\nLines removed: " .. Tetrisparams.lscore .. "\nBlocks spawned: " .. Tetrisparams.bscore)
+            _showMessagePopup("GAME OVER\nLines removed: " .. Tetrisparams.lscore .. "\nBlocks spawned: " .. Tetrisparams.bscore, 200, 100, false)
         else
-            Tetris.UI.label:SetText("GAME OVER")
+            _showMessagePopup("GAME OVER", 200, 100, false)
         end
-        Tetris.UI.label:SetHorizontalAlignment(TEXT_ALIGN_CENTER)
-        Tetris.UI.labelBg:SetHidden(false)
         EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "gameover", 150, Tetris.gameOver)
     else
         _setBlockToArray(typus)
@@ -311,7 +329,7 @@ function Tetris.gameOver()
         
         if Tetris.running == true then
             greyline = Tetris.height-1
-            Tetris.UI.labelBg:SetHidden(true)
+            _hideMessagePopup(false)
             gameover = false
             Tetris.PV:show()
             _createBlock()
@@ -485,17 +503,12 @@ function Tetris.toggle(fishingState)
         ZO_Keybindings_GetHighestPriorityBindingStringFromAction("TETRISROTATE", KEYBIND_TEXT_OPTIONS_FULL_NAME) == nil or
         ZO_Keybindings_GetHighestPriorityBindingStringFromAction("TETRISSLAM", KEYBIND_TEXT_OPTIONS_FULL_NAME) == nil then
             EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
-            Tetris.running = false
-            Tetris.UI.label:SetText("You have\nunassigned Keybinds\n\nGo to controls\nand enter Tetris keys")
-            Tetris.UI.label:SetHorizontalAlignment(TEXT_ALIGN_CENTER)
-            Tetris.UI.labelBg:SetHidden(false)
-            Tetris.UI.labelBg:SetDimensions(200, 200)
+            _showMessagePopup("You have\nunassigned Keybinds\n\nGo to controls\nand enter Tetris keys", 200, 200, true)
             Tetris.PV:hide()
             HUD_SCENE:AddFragment(Tetris.fragment)
             LOOT_SCENE:AddFragment(Tetris.fragment)
     else
-            Tetris.UI.labelBg:SetHidden(true)
-            Tetris.UI.labelBg:SetDimensions(200, 100)
+            _hideMessagePopup(false)
     end
 
     if fishingState == Tetris.engine.state.reelin and Tetrisparams.blink == true then
@@ -512,8 +525,7 @@ function Tetris.toggle(fishingState)
             HUD_SCENE:AddFragment(Tetris.fragment)
             LOOT_SCENE:AddFragment(Tetris.fragment)
             Tetris.PV:show()
-            Tetris.UI.labelBg:SetHidden(true)
-            Tetris.running = true
+            _hideMessagePopup(true)
             cleanUpRandom()
             EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "tick", Tetrisparams.timeout, Tetris.tick)
         end
@@ -522,15 +534,12 @@ function Tetris.toggle(fishingState)
     elseif fishingState == Tetris.engine.state.loot or
            ((fishingState == Tetris.engine.state.reelin or fishingState == Tetris.engine.state.looking) and Tetrisparams.lookingPause) then
         EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
-        Tetris.running = false
 
         if Tetrisparams.showStats == true then
-            Tetris.UI.label:SetText("Pause\nLines removed: " .. Tetrisparams.lscore .. "\nBlocks spawned: " .. Tetrisparams.bscore)
+            _showMessagePopup("Pause\nLines removed: " .. Tetrisparams.lscore .. "\nBlocks spawned: " .. Tetrisparams.bscore, 200, 100, true)
         else
-            Tetris.UI.label:SetText("Pause")
+            _showMessagePopup("Pause", 200, 100, true)
         end
-        Tetris.UI.label:SetHorizontalAlignment(TEXT_ALIGN_CENTER)
-        Tetris.UI.labelBg:SetHidden(false)
         HUD_SCENE:AddFragment(Tetris.fragment)
         Tetris.PV:hide()
 
