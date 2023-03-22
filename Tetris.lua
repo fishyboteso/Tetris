@@ -476,29 +476,6 @@ local function _backgroundBlink()
 end
 
 
-local function _simpleEngine()
-    local action, interactableName, _, _, additionalInfo = GetGameCameraInteractableActionInfo()
-    if additionalInfo == ADDITIONAL_INTERACT_INFO_FISHING_NODE and tmpFishingState == 0 then
-        tmpFishingState = 1
-        tmpInteractableName = interactableName
-        HUD_SCENE:AddFragment(Tetris.fragment)
-        LOOT_SCENE:AddFragment(Tetris.fragment)
-        Tetris.PV:show()
-        Tetris.running = true
-        EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "tick", Tetrisparams.timeout, Tetris.tick)
-    elseif action and tmpInteractableName == interactableName then
-    elseif additionalInfo ~= ADDITIONAL_INTERACT_INFO_FISHING_NODE and tmpFishingState == 1 then
-        tmpFishingState = 0
-        tmpInteractableName = ""
-        EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
-        Tetris.running = false
-        Tetris.PV:hide()
-        HUD_SCENE:RemoveFragment(Tetris.fragment)
-        LOOT_SCENE:RemoveFragment(Tetris.fragment)
-    end
-end
-
-
 -- Toggle Tetris running state and visibility
 function Tetris.toggle(fishingState)
 
@@ -519,12 +496,6 @@ function Tetris.toggle(fishingState)
     else
             Tetris.UI.labelBg:SetHidden(true)
             Tetris.UI.labelBg:SetDimensions(200, 100)
-    end
-
-    --simple engine if no Chalutier engine is available
-    if not Tetris.engine then
-        _simpleEngine()
-        return
     end
 
     if fishingState == Tetris.engine.state.reelin and Tetrisparams.blink == true then
@@ -718,28 +689,21 @@ local function _createMenu()
             type = "divider",
         },
         {
-            type = "description",
-            title = "Attention",
-            text = "To use these functions you have to install Chalutier.",
-        },
-        {
             type = "checkbox",
-            name = "Blink when fish is on the hook.",
-            disabled = function() if Tetris.engine then return false end return true end,
-            default = function() if Tetris.engine then return Tetrisparams.blink end return false end,
-            getFunc = function() if Tetris.engine then return Tetrisparams.blink end return false end,
+            name = "Blink when the fish is on the hook.",
+            default = function() return Tetrisparams.blink end,
+            getFunc = function() return Tetrisparams.blink end,
             setFunc = function(value) Tetrisparams.blink = value end,
-            tooltip = "Needs Chalutier to enable.",
+            tooltip = "Lead's your attention back to fishing when needed.",
             requiresReload = false
         },
         {
             type = "checkbox",
             name = "Pause while looking at a fishing hole.",
-            disabled = function() if Tetris.engine then return false end return true end,
-            default = function() if Tetris.engine then return Tetrisparams.lookingPause end return false end,
-            getFunc = function() if Tetris.engine then return Tetrisparams.lookingPause end return false end,
+            default = function() return Tetrisparams.lookingPause end,
+            getFunc = function() return Tetrisparams.lookingPause end,
             setFunc = function(value) Tetrisparams.lookingPause = value end,
-            tooltip = "Needs Chalutier to enable.",
+            tooltip = "Start fishing to start the game.",
             requiresReload = false
         },
         {
@@ -823,17 +787,6 @@ function Tetris.OnAddOnLoaded(event, addonName)
         ZO_CreateStringId("SI_BINDING_NAME_TETRISROTATE", "Rotate")
         ZO_CreateStringId("SI_BINDING_NAME_TETRISSLAM", "Slam")
 
-        -- connect to Tetris.engine
-        if Chalutier then
-            Tetris.engine = Chalutier
-            Tetris.statechange = "CHALUTIER_STATE_CHANGE"
-        elseif FishyCha then
-            Tetris.engine = FishyCha
-            Tetris.statechange = "FishyCha_STATE_CHANGE"
-        else
-            Tetris.engine = nil
-        end
-
         -- create UI
         _createUI()
         _createMenu()
@@ -854,12 +807,10 @@ function Tetris.OnAddOnLoaded(event, addonName)
         -- init state
         Tetris.running = false
 
-        if Tetris.engine then
-            Tetris.engine.CallbackManager:RegisterCallback(Tetris.engine.name .. Tetris.statechange, Tetris.toggle)
-        else
-            ZO_PreHookHandler(RETICLE.interact, "OnEffectivelyShown", Tetris.toggle)
-            ZO_PreHookHandler(RETICLE.interact, "OnHide", Tetris.toggle)
-        end
+        -- connect to Tetris.engine
+        TetrisChaInit()
+        Tetris.engine = TetrisCha
+        Tetris.engine.CallbackManager:RegisterCallback(Tetris.engine.name .. "TetrisCha_STATE_CHANGE", Tetris.toggle)
 
     end
 end
