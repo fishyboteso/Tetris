@@ -44,6 +44,7 @@ local Tetrisdefaults = {
     lscore       = 0,
     showStats    = true,
     array        = nil,
+    Block        = nil,
     preview      = true
 }
 
@@ -840,6 +841,8 @@ function Tetris.OnAddOnLoaded(event, addonName)
         -- reinit last game from savedvar
         if Tetrisparams.array then
             Tetris.array = deepcopy(Tetrisparams.array)
+        end
+        if Tetrisparams.Block then
             Tetris.Block = deepcopy(Tetrisparams.Block)
         end
         if not Tetris.Block.typus then
