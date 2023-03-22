@@ -13,6 +13,10 @@
 				<Down></Down>
                 <Up>Tetris.keyRotate()</Up>
             </Action>
+            <Action name="TETRISROTATECOUNTER">
+				<Down></Down>
+                <Up>Tetris.keyRotateCounter()</Up>
+            </Action>
             <Action name="TETRISSLAM">
 				<Down></Down>
                 <Up>Tetris.keySlam()</Up>

@@ -17,8 +17,9 @@ Tetris.manipulations = {
     left = 1,
     right = 2,
     rotate = 3,
-    slam = 4,
-    down = 5
+    rotatecounter = 4,
+    slam = 5,
+    down = 6
 }
 --Struct for Block types
 Tetris.blocks = {
@@ -114,6 +115,8 @@ local function _execManipulation(manipulation)
         Tetris.Block = TetrisMoves.right(Tetris.Block)
     elseif manipulation == Tetris.manipulations.rotate then
         Tetris.Block = TetrisMoves.rotate(Tetris.Block)
+    elseif manipulation == Tetris.manipulations.rotatecounter then
+        Tetris.Block = TetrisMoves.rotatecounter(Tetris.Block)
     elseif manipulation == Tetris.manipulations.down then
         Tetris.Block = TetrisMoves.down(Tetris.Block)
     end
@@ -331,7 +334,7 @@ function Tetris.gameOver()
         gameover = false
         greyline = Tetris.height-1
         _updateScore(0, 0)
-        
+
         if Tetris.running == true then
             _hideMessagePopup(false)
             Tetris.PV:show()
@@ -396,6 +399,10 @@ local function _manipulate(manipulation)
         result = _execManipulation(manipulation)
 
     elseif manipulation == Tetris.manipulations.rotate and maxManipulations.rotate > 0 then
+        maxManipulations.rotate = maxManipulations.rotate - 1
+        result = _execManipulation(manipulation)
+
+    elseif manipulation == Tetris.manipulations.rotatecounter and maxManipulations.rotate > 0 then
         maxManipulations.rotate = maxManipulations.rotate - 1
         result = _execManipulation(manipulation)
     end
@@ -487,6 +494,11 @@ function Tetris.keyRotate()
         _manipulate(Tetris.manipulations.rotate)
     end
 end
+function Tetris.keyRotateCounter()
+    if gameover == false and Tetris.running == true then
+        _manipulate(Tetris.manipulations.rotatecounter)
+    end
+end
 function Tetris.keySlam()
     if gameover == false and Tetris.running == true then
         _manipulate(Tetris.manipulations.slam)
@@ -509,6 +521,7 @@ function Tetris.toggle(fishingState)
     if  ZO_Keybindings_GetHighestPriorityBindingStringFromAction("TETRISLEFT", KEYBIND_TEXT_OPTIONS_FULL_NAME) == nil or
         ZO_Keybindings_GetHighestPriorityBindingStringFromAction("TETRISRIGHT", KEYBIND_TEXT_OPTIONS_FULL_NAME) == nil or
         ZO_Keybindings_GetHighestPriorityBindingStringFromAction("TETRISROTATE", KEYBIND_TEXT_OPTIONS_FULL_NAME) == nil or
+        ZO_Keybindings_GetHighestPriorityBindingStringFromAction("TETRISROTATECOUNTER", KEYBIND_TEXT_OPTIONS_FULL_NAME) == nil or
         ZO_Keybindings_GetHighestPriorityBindingStringFromAction("TETRISSLAM", KEYBIND_TEXT_OPTIONS_FULL_NAME) == nil then
             EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
             _showMessagePopup("You have\nunassigned Keybinds\n\nGo to controls\nand enter Tetris keys", 200, 200, true)
@@ -815,7 +828,8 @@ function Tetris.OnAddOnLoaded(event, addonName)
         -- strings for keybindings
         ZO_CreateStringId("SI_BINDING_NAME_TETRISLEFT", "Move Left")
         ZO_CreateStringId("SI_BINDING_NAME_TETRISRIGHT", "Move Right")
-        ZO_CreateStringId("SI_BINDING_NAME_TETRISROTATE", "Rotate")
+        ZO_CreateStringId("SI_BINDING_NAME_TETRISROTATE", "Rotate Clockwise")
+        ZO_CreateStringId("SI_BINDING_NAME_TETRISROTATECOUNTER", "Rotate Counterclockwise")
         ZO_CreateStringId("SI_BINDING_NAME_TETRISSLAM", "Slam")
 
         -- create UI
