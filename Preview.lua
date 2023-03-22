@@ -19,16 +19,10 @@ local function _setBlocktoArray()
         end
     end
 
-    if TetrisPV.Block.typus ~= Tetris.blocks.i then
-        y = 1
-    else
-        y = 0
-    end
-
-    TetrisPV.array[TetrisPV.Block.a.x - 3][TetrisPV.Block.a.y + y] = TetrisPV.Block.typus
-    TetrisPV.array[TetrisPV.Block.b.x - 3][TetrisPV.Block.b.y + y] = TetrisPV.Block.typus
-    TetrisPV.array[TetrisPV.Block.c.x - 3][TetrisPV.Block.c.y + y] = TetrisPV.Block.typus
-    TetrisPV.array[TetrisPV.Block.d.x - 3][TetrisPV.Block.d.y + y] = TetrisPV.Block.typus
+    TetrisPV.array[TetrisPV.Block.a.x - 3][TetrisPV.Block.a.y + 3] = TetrisPV.Block.typus
+    TetrisPV.array[TetrisPV.Block.b.x - 3][TetrisPV.Block.b.y + 3] = TetrisPV.Block.typus
+    TetrisPV.array[TetrisPV.Block.c.x - 3][TetrisPV.Block.c.y + 3] = TetrisPV.Block.typus
+    TetrisPV.array[TetrisPV.Block.d.x - 3][TetrisPV.Block.d.y + 3] = TetrisPV.Block.typus
 end
 
 

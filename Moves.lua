@@ -15,73 +15,73 @@ function TetrisMoves.start(typus)
 
     if typus == 1 then --J
         Block.a.x = 4
-        Block.a.y = 0
+        Block.a.y = -2
         Block.b.x = 4
-        Block.b.y = 1
+        Block.b.y = -1
         Block.c.x = 5
-        Block.c.y = 1
+        Block.c.y = -1
         Block.d.x = 6
-        Block.d.y = 1
+        Block.d.y = -1
 
     elseif typus == 2 then --L
         Block.a.x = 4
-        Block.a.y = 1
+        Block.a.y = -1
         Block.b.x = 5
-        Block.b.y = 1
+        Block.b.y = -1
         Block.c.x = 6
-        Block.c.y = 0
+        Block.c.y = -2
         Block.d.x = 6
-        Block.d.y = 1
+        Block.d.y = -1
 
     elseif typus == 3 then --T
         Block.a.x = 4
-        Block.a.y = 1
+        Block.a.y = -1
         Block.b.x = 5
-        Block.b.y = 0
+        Block.b.y = -2
         Block.c.x = 5
-        Block.c.y = 1
+        Block.c.y = -1
         Block.d.x = 6
-        Block.d.y = 1
+        Block.d.y = -1
 
     elseif typus == 4 then --I
         Block.a.x = 3
-        Block.a.y = 0
+        Block.a.y = -2
         Block.b.x = 4
-        Block.b.y = 0
+        Block.b.y = -2
         Block.c.x = 5
-        Block.c.y = 0
+        Block.c.y = -2
         Block.d.x = 6
-        Block.d.y = 0
+        Block.d.y = -2
 
     elseif typus == 5 then --Z
         Block.a.x = 4
-        Block.a.y = 0
+        Block.a.y = -2
         Block.b.x = 5
-        Block.b.y = 0
+        Block.b.y = -2
         Block.c.x = 5
-        Block.c.y = 1
+        Block.c.y = -1
         Block.d.x = 6
-        Block.d.y = 1
+        Block.d.y = -1
 
     elseif typus == 6 then --S
         Block.a.x = 4
-        Block.a.y = 1
+        Block.a.y = -1
         Block.b.x = 5
-        Block.b.y = 0
+        Block.b.y = -2
         Block.c.x = 5
-        Block.c.y = 1
+        Block.c.y = -1
         Block.d.x = 6
-        Block.d.y = 0
+        Block.d.y = -2
 
     elseif typus == 7 then --O
         Block.a.x = 4
-        Block.a.y = 0
+        Block.a.y = -2
         Block.b.x = 4
-        Block.b.y = 1
+        Block.b.y = -1
         Block.c.x = 5
-        Block.c.y = 0
+        Block.c.y = -2
         Block.d.x = 5
-        Block.d.y = 1
+        Block.d.y = -1
     end
 
     return Block

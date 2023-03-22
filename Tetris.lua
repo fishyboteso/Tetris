@@ -151,8 +151,10 @@ local function _execManipulation(manipulation)
     end
 
      --check if pixels are free
-    if Tetris.array[Tetris.Block.a.x][Tetris.Block.a.y] ~= Tetris.blocks.none or Tetris.array[Tetris.Block.b.x][Tetris.Block.b.y] ~= Tetris.blocks.none or
-       Tetris.array[Tetris.Block.c.x][Tetris.Block.c.y] ~= Tetris.blocks.none or Tetris.array[Tetris.Block.d.x][Tetris.Block.d.y] ~= Tetris.blocks.none then
+    if Tetris.array[Tetris.Block.a.x][Tetris.Block.a.y] and Tetris.array[Tetris.Block.a.x][Tetris.Block.a.y] > Tetris.blocks.none
+    or Tetris.array[Tetris.Block.b.x][Tetris.Block.b.y] and Tetris.array[Tetris.Block.b.x][Tetris.Block.b.y] > Tetris.blocks.none
+    or Tetris.array[Tetris.Block.c.x][Tetris.Block.c.y] and Tetris.array[Tetris.Block.c.x][Tetris.Block.c.y] > Tetris.blocks.none
+    or Tetris.array[Tetris.Block.d.x][Tetris.Block.d.y] and Tetris.array[Tetris.Block.d.x][Tetris.Block.d.y] > Tetris.blocks.none then
         Tetris.Block = deepcopy(tempBlock)
         Tetrisparams.Block = deepcopy(Tetris.Block)
 
@@ -212,26 +214,22 @@ end
 -- else FALSE
 local function _checkMoves()
     if Tetris.Block.a.y >= Tetris.Block.b.y and Tetris.Block.a.y >= Tetris.Block.c.y and Tetris.Block.a.y >= Tetris.Block.d.y then
-        if Tetris.array[Tetris.Block.a.x][Tetris.Block.a.y+1] ~= Tetris.blocks.none then
+        if Tetris.array[Tetris.Block.a.x][Tetris.Block.a.y+1] and Tetris.array[Tetris.Block.a.x][Tetris.Block.a.y+1] ~= Tetris.blocks.none then
             return false
         end
-
     elseif Tetris.Block.b.y >= Tetris.Block.a.y and Tetris.Block.b.y >= Tetris.Block.c.y and Tetris.Block.b.y >= Tetris.Block.d.y then
-        if Tetris.array[Tetris.Block.b.x][Tetris.Block.b.y+1] ~= Tetris.blocks.none then
+        if Tetris.array[Tetris.Block.b.x][Tetris.Block.b.y+1] and Tetris.array[Tetris.Block.b.x][Tetris.Block.b.y+1] ~= Tetris.blocks.none then
             return false
         end
-
     elseif Tetris.Block.c.y >= Tetris.Block.a.y and Tetris.Block.c.y >= Tetris.Block.b.y and Tetris.Block.c.y >= Tetris.Block.d.y then
-        if Tetris.array[Tetris.Block.c.x][Tetris.Block.c.y+1] ~= Tetris.blocks.none then
+        if Tetris.array[Tetris.Block.c.x][Tetris.Block.c.y+1] and Tetris.array[Tetris.Block.c.x][Tetris.Block.c.y+1] ~= Tetris.blocks.none then
             return false
         end
-
     elseif Tetris.Block.d.y >= Tetris.Block.a.y and Tetris.Block.d.y >= Tetris.Block.b.y and Tetris.Block.d.y >= Tetris.Block.c.y then
-        if Tetris.array[Tetris.Block.d.x][Tetris.Block.d.y+1] ~= Tetris.blocks.none then
+        if Tetris.array[Tetris.Block.d.x][Tetris.Block.d.y+1] and Tetris.array[Tetris.Block.d.x][Tetris.Block.d.y+1] ~= Tetris.blocks.none then
             return false
         end
     end
-
     return true
 end
 
@@ -293,7 +291,7 @@ local function _createBlock()
     Tetrisparams.Block = deepcopy(Tetris.Block)
 
     -- check for "game over"
-    if not _checkMoves() or not _checkBlock() then
+    if not _checkMoves() then
         EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
         gameover = true
 
