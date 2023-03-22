@@ -328,17 +328,17 @@ function Tetris.gameOver()
 
     -- exit condition, for when all lines are removed
     if greyline == -1 then
+        gameover = false
+        greyline = Tetris.height-1
         _updateScore(0, 0)
-
+        
         if Tetris.running == true then
-            greyline = Tetris.height-1
             _hideMessagePopup(false)
-            gameover = false
             Tetris.PV:show()
             _createBlock()
             EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "tick", Tetrisparams.timeout, Tetris.tick)
-            return
         end
+        return
     end
 
     -- remove next line and timeout
