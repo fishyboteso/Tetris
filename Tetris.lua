@@ -353,16 +353,16 @@ function Tetris.gameOver()
 end
 
 
--- Slam timeout to allow one more manipulation after slam
-local function _slam()
-    EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "slam")
+-- lockDown timeout to allow one more manipulation after slam
+slamed = false
+local function _lockDown()
+    EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "lockDown")
     slamed = false
     Tetris.tick()
 end
 
 
 -- Manipulate active Block (left,right,rotate,slam)
-slamed = false
 local function _manipulate(manipulation)
     if Tetris.running == false then
         return false
@@ -377,11 +377,11 @@ local function _manipulate(manipulation)
         end
 
         if not slamed then
-            -- slam timeout to allow one more manipulation after slam
-            EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "slam", 250, _slam)
+            -- lockDown timeout to allow one more manipulation after slam
+            EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "lockDown", 500, _lockDown)
             slamed = true
         else
-            _slam()
+            _lockDown()
         end
 
     elseif manipulation == Tetris.manipulations.down then
@@ -452,8 +452,13 @@ function Tetris.tick()
     end
 
     if not _manipulate(Tetris.manipulations.down) then
-        _removeLines()
-        _createBlock()
+        EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "tilelocked", 500, function()
+            EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tilelocked")
+            _removeLines()
+            _createBlock()
+            Tetris.tick()
+        end)
+        return
     end
 
     --reset maxManipulations
