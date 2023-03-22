@@ -515,6 +515,7 @@ function Tetris.toggle(fishingState)
             Tetris.PV:hide()
             HUD_SCENE:AddFragment(Tetris.fragment)
             LOOT_SCENE:AddFragment(Tetris.fragment)
+            return
     else
             _hideMessagePopup(false)
     end
