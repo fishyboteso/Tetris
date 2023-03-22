@@ -281,6 +281,7 @@ local function _hideMessagePopup(pause)
     end
 end
 
+
 -- Creates a new Block if possible, else it triggers "game over" state
 local function _createBlock()
     -- get the Block start layout from  Moves.lua
@@ -328,7 +329,7 @@ function Tetris.gameOver()
     -- exit condition, for when all lines are removed
     if greyline == -1 then
         _updateScore(0, 0)
-        
+
         if Tetris.running == true then
             greyline = Tetris.height-1
             _hideMessagePopup(false)
@@ -447,8 +448,8 @@ function Tetris.tick()
 
     -- no ticks in game menu
     if SCENE_MANAGER:IsShowing("gameMenuInGame") == true then
-		return
-	end
+        return
+    end
 
     if not _manipulate(Tetris.manipulations.down) then
         _removeLines()
@@ -611,7 +612,7 @@ local function _createUI()
     Tetris.UI.label:SetText("TESTLABEL")
     Tetris.UI.label:SetDrawLevel(3)
     Tetris.UI.label:SetHidden(false)
-    
+
     -- Create UI for Preview
     Tetris.PV:createUI(Tetrisparams)
     Tetris.PV:getNextTypus()

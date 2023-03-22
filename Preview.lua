@@ -141,7 +141,7 @@ function TetrisPV:createUI(params)
             TetrisPV.UI.pixel[i][j]:SetDrawLevel(1)
         end
     end
-    
+
     TetrisPV.fragment = ZO_FadeSceneFragment:New(TetrisPV.UI, 100, 200)
     TetrisPV.UI:SetHidden(true)
 
