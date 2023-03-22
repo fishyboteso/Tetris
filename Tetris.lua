@@ -267,6 +267,7 @@ local function _showMessagePopup(messageText, dimx, dimy, pause)
     Tetris.UI.label:SetHorizontalAlignment(TEXT_ALIGN_CENTER)
     Tetris.UI.labelBg:SetDimensions(dimx, dimy)
     Tetris.UI.labelBg:SetHidden(false)
+    Tetris.PV:hide()
 end
 
 
@@ -274,6 +275,7 @@ local function _hideMessagePopup(pause)
     Tetris.UI.labelBg:SetHidden(true)
     Tetris.UI.label:SetText("")
     Tetris.UI.labelBg:SetDimensions(200, 100)
+    Tetris.PV:show()
     if pause then
         Tetris.running = true
     end
@@ -594,6 +596,7 @@ local function _createUI()
         end
     end
 
+    -- Create Message Popup and Background
     Tetris.UI.labelBg = WINDOW_MANAGER:CreateControl(nil, Tetris.UI, CT_TEXTURE)
     Tetris.UI.labelBg:SetDimensions(200, 100)
     Tetris.UI.labelBg:SetColor(0.8, 0.8, 0.8, 0.8)
@@ -621,7 +624,26 @@ local function _createUI()
     Tetris.UI:SetHandler("OnMoveStop", function()
         Tetrisparams.posy = Tetris.UI:GetTop()
         Tetrisparams.posx = Tetris.UI:GetRight() - GuiRoot:GetRight()
+        Tetris.PV:resize(Tetrisparams.pixelsize)
     end)
+end
+
+local function _resize(newPxSize)
+    Tetrisparams.pixelsize = newPxSize
+
+    dimX = Tetris.brdr + Tetris.width*Tetrisparams.pixelsize + Tetris.brdr
+    dimY = Tetris.brdr + Tetris.height*Tetrisparams.pixelsize + Tetris.brdr
+    Tetris.UI:SetDimensions(dimX, dimY)
+    Tetris.UI.background:SetDimensions(dimX, dimY)
+
+    for i=0,Tetris.width-1 do
+        for j=0,Tetris.height-1 do
+            Tetris.UI.pixel[i][j]:SetDimensions(Tetrisparams.pixelsize-2, Tetrisparams.pixelsize-2)
+            Tetris.UI.pixel[i][j]:SetAnchor(TOPLEFT, Tetris.UI.background, TOPLEFT, Tetris.brdr+1+(i*Tetrisparams.pixelsize), Tetris.brdr+1+(j*Tetrisparams.pixelsize))
+        end
+    end
+
+    Tetris.PV:resize(newPxSize)
 end
 
 
@@ -641,28 +663,19 @@ local function _createMenu()
     }
     local panel = LAM:RegisterAddonPanel(panelName, panelData)
 
-    panel:SetHandler("OnEffectivelyHidden", function()
-        Tetrisparams.posy = Tetris.UI:GetTop()
-        Tetrisparams.posx = Tetris.UI:GetRight() - GuiRoot:GetRight()
-        if pressedShow == true then
-            HUD_UI_SCENE:RemoveFragment(Tetris.fragment)
-            Tetris.UI:SetHidden(true)
-        end
-    end)
-
     local optionsData = {
         {
             type = "slider",
             name = "Pixel Size",
             min = 1,
-            max = 30,
+            max = 100,
             default = Tetrisparams.pixelsize,
             getFunc = function() return Tetrisparams.pixelsize end,
             setFunc = function(value)
-                Tetrisparams.pixelsize = value
+                _resize(value)
             end,
             tooltip = "Set the size of each pixel of the Tetris field.",
-            requiresReload = true
+            requiresReload = false
         },
         {
             type = "slider",
@@ -752,12 +765,14 @@ local function _createMenu()
                     pressedShow = true
                     HUD_UI_SCENE:AddFragment(Tetris.fragment)
                     Tetris.UI:SetHidden(false)
+                    Tetris.PV:show()
                 elseif pressedShow == true then
                     pressedShow = false
                     Tetrisparams.posy = Tetris.UI:GetTop()
                     Tetrisparams.posx = Tetris.UI:GetRight() - GuiRoot:GetRight()
                     HUD_UI_SCENE:RemoveFragment(Tetris.fragment)
                     Tetris.UI:SetHidden(true)
+                    Tetris.PV:hide()
                 end
             end,
             width = "half",

@@ -79,6 +79,26 @@ function TetrisPV:hide()
 end
 
 
+function TetrisPV:resize(newPxSize)
+    dimXPV = Tetris.brdr + TetrisPV.width*newPxSize + Tetris.brdr
+    dimYPV = Tetris.brdr + TetrisPV.height*newPxSize + Tetris.brdr
+    dimX,dimY = Tetris.UI.background:GetDimensions()
+    posy = Tetris.UI:GetTop()
+    posx = Tetris.UI:GetRight() - GuiRoot:GetRight()
+
+    TetrisPV.UI:SetDimensions(dimXPV, dimYPV)
+    TetrisPV.UI:SetAnchor(TOPRIGHT, GuiRoot, TOPRIGHT, posx - ((dimX - dimXPV)/2), posy - dimYPV)
+    TetrisPV.UI.background:SetDimensions(dimXPV, dimYPV)
+
+    for i=0,TetrisPV.width-1 do
+        for j=0,TetrisPV.height-1 do
+            TetrisPV.UI.pixel[i][j]:SetDimensions(newPxSize-2, newPxSize-2)
+            TetrisPV.UI.pixel[i][j]:SetAnchor(TOPLEFT, TetrisPV.UI.background, TOPLEFT, Tetris.brdr+1+(i*newPxSize), Tetris.brdr+1+(j*newPxSize))
+        end
+    end
+end
+
+
 -- Create UI for Preview
 function TetrisPV:createUI(params)
 
