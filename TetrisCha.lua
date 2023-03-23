@@ -20,6 +20,12 @@ TetrisCha.state     = {
     dead      = 15  --Dead
 }
 
+
+function TetrisCha:getCurrentState()
+    return TetrisCha.currentState
+end
+
+
 local function _changeState(state, overwrite)
     if TetrisCha.currentState == state then return end
 

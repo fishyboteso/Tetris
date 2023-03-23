@@ -330,12 +330,12 @@ local function _createBlock()
     Tetrisparams.Block = deepcopy(Tetris.Block)
 
     -- check for "game over"
-    if not _checkMoves() then
+    if not _isFreeBelow() then
         EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
+        EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "lockDown")
         gameover = true
 
         Tetris.PV:hide()
-        Tetris.PV.bag={}
 
         if Tetrisparams.showStats == true then
             _showMessagePopup("GAME OVER\nLines removed: " .. Tetrisparams.lscore .. "\nBlocks spawned: " .. Tetrisparams.bscore, 200, 100, false)
@@ -364,13 +364,14 @@ function Tetris.gameOver()
     EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "gameover")
     EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
 
-    cleanUpRandom()
-
     -- exit condition, for when all lines are removed
     if greyline == -1 then
         gameover = false
         greyline = Tetris.height-1
         _updateScore(0, 0)
+
+        cleanUpRandom()
+        Tetris.PV:clearBag()
 
         if Tetris.running == true and not SCENE_MANAGER:IsShowing("gameMenuInGame") then
             _hideMessagePopup(false)
@@ -434,7 +435,6 @@ local function _lockDown()
     EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "lockDown")
     willLockSoon = false
 
-
     if not _isFreeBelow() then
         _removeLines()
         _createBlock()
@@ -464,7 +464,6 @@ local function _manipulate(manipulation)
     result = true
     if manipulation == Tetris.manipulations.slam then
         EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
-
         while _isFreeBelow() and result do
             result = _execManipulation(Tetris.manipulations.down)
         end
@@ -506,8 +505,8 @@ function Tetris.tick()
     --unset timer
     EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
 
-    -- no ticks in game menu
-    if SCENE_MANAGER:IsShowing("gameMenuInGame") then
+    -- ticks only in hud scene
+    if not SCENE_MANAGER:IsShowing("hud") or gameover then
         return
     end
 
@@ -520,7 +519,7 @@ function Tetris.tick()
     maxManipulations = { left = 5, right = 5, rotate = 4 }
 
     --set timer
-    if Tetris.running == true then
+    if Tetris.running then
         EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "tick", Tetrisparams.timeout, Tetris.tick)
     end
 end
@@ -589,8 +588,10 @@ function Tetris.toggle(fishingState)
     end
 
     -- Tetris.engine states that start Tetris
-    if ((fishingState == Tetris.engine.state.looking or fishingState == Tetris.engine.state.reelin) and not Tetrisparams.lookingPause) or
-       fishingState == Tetris.engine.state.fishing then
+    if SCENE_MANAGER:IsShowing("hud")
+        and (((fishingState == Tetris.engine.state.looking or fishingState == Tetris.engine.state.reelin) and not Tetrisparams.lookingPause)
+        or fishingState == Tetris.engine.state.fishing)
+    then
         if Tetris.running == false then
             HUD_SCENE:AddFragment(Tetris.fragment)
             LOOT_SCENE:AddFragment(Tetris.fragment)
@@ -620,6 +621,14 @@ function Tetris.toggle(fishingState)
         Tetris.PV:hide()
         HUD_SCENE:RemoveFragment(Tetris.fragment)
         LOOT_SCENE:RemoveFragment(Tetris.fragment)
+    end
+end
+
+local function _toggleWrapper(oldState, newState)
+    if newState == SCENE_HIDDEN then
+        Tetris.toggle(Tetris.engine.state.idle)
+    elseif newState == SCENE_SHOWN then
+        Tetris.toggle(Tetris.engine:getCurrentState())
     end
 end
 
@@ -904,6 +913,7 @@ function Tetris.OnAddOnLoaded(event, addonName)
         TetrisChaInit()
         Tetris.engine = TetrisCha
         Tetris.engine.CallbackManager:RegisterCallback(Tetris.engine.name .. "TetrisCha_STATE_CHANGE", Tetris.toggle)
+        HUD_SCENE:RegisterCallback("StateChange", _toggleWrapper)
 
     end
 end

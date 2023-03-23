@@ -38,6 +38,13 @@ local function _shuffleBag()
 end
 
 
+function TetrisPV:clearBag()
+    TetrisPV.bag = {}
+    TetrisPV.bag = _shuffleBag()
+    TetrisPV.nextTypus = table.remove(TetrisPV.bag)
+end
+
+
 -- Define a function to pop one item from the bag
 function TetrisPV:getNextTypus()
     -- Regenerate and shuffle the bag if it's empty
