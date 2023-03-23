@@ -234,14 +234,53 @@ local function _checkMoves()
 end
 
 
--- Checks if the new Block fits into the field
--- returns TRUE if a new Block can be spawned
+-- Checks if any more downwards moves are possible for active Block
+-- returns TRUE if down move is possible for Block
 -- else FALSE
-local function _checkBlock()
-    if Tetris.array[Tetris.Block.a.x][Tetris.Block.a.y] ~= Tetris.blocks.none or Tetris.array[Tetris.Block.b.x][Tetris.Block.b.y] ~= Tetris.blocks.none or
-       Tetris.array[Tetris.Block.c.x][Tetris.Block.c.y] ~= Tetris.blocks.none or Tetris.array[Tetris.Block.d.x][Tetris.Block.d.y] ~= Tetris.blocks.none then
+local function _isFreeBelow()
+    -- hit the bottom
+    if Tetris.Block.a.y+1 >= Tetris.height or Tetris.Block.b.y+1 >= Tetris.height
+    or Tetris.Block.c.y+1 >= Tetris.height or Tetris.Block.d.y+1 >= Tetris.height then
         return false
     end
+
+    if Tetris.array[Tetris.Block.a.x][Tetris.Block.a.y+1] -- the block below A is in the playing field
+        and Tetris.array[Tetris.Block.a.x][Tetris.Block.a.y+1] ~= Tetris.blocks.none -- the block below has no color
+        and not (Tetris.Block.a.y+1 == Tetris.Block.b.y and Tetris.Block.a.x == Tetris.Block.b.x) -- it is not b
+        and not (Tetris.Block.a.y+1 == Tetris.Block.c.y and Tetris.Block.a.x == Tetris.Block.c.x) -- nor c
+        and not (Tetris.Block.a.y+1 == Tetris.Block.d.y and Tetris.Block.a.x == Tetris.Block.d.x) -- nor d
+    then
+        return false
+    end
+
+    --analog for B,C and D
+    if Tetris.array[Tetris.Block.b.x][Tetris.Block.b.y+1]
+        and Tetris.array[Tetris.Block.b.x][Tetris.Block.b.y+1] ~= Tetris.blocks.none
+        and not (Tetris.Block.b.y+1 == Tetris.Block.a.y and Tetris.Block.b.x == Tetris.Block.a.x)
+        and not (Tetris.Block.b.y+1 == Tetris.Block.c.y and Tetris.Block.b.x == Tetris.Block.c.x)
+        and not (Tetris.Block.b.y+1 == Tetris.Block.d.y and Tetris.Block.b.x == Tetris.Block.d.x)
+    then
+        return false
+    end
+
+    if Tetris.array[Tetris.Block.c.x][Tetris.Block.c.y+1]
+        and Tetris.array[Tetris.Block.c.x][Tetris.Block.c.y+1] ~= Tetris.blocks.none
+        and not (Tetris.Block.c.y+1 == Tetris.Block.a.y and Tetris.Block.c.x == Tetris.Block.a.x)
+        and not (Tetris.Block.c.y+1 == Tetris.Block.b.y and Tetris.Block.c.x == Tetris.Block.b.x)
+        and not (Tetris.Block.c.y+1 == Tetris.Block.d.y and Tetris.Block.c.x == Tetris.Block.d.x)
+    then
+        return false
+    end
+
+    if Tetris.array[Tetris.Block.d.x][Tetris.Block.d.y+1]
+        and Tetris.array[Tetris.Block.d.x][Tetris.Block.d.y+1] ~= Tetris.blocks.none
+        and not (Tetris.Block.d.y+1 == Tetris.Block.a.y and Tetris.Block.d.x == Tetris.Block.a.x)
+        and not (Tetris.Block.d.y+1 == Tetris.Block.b.y and Tetris.Block.d.x == Tetris.Block.b.x)
+        and not (Tetris.Block.d.y+1 == Tetris.Block.c.y and Tetris.Block.d.x == Tetris.Block.c.x)
+    then
+        return false
+    end
+
     return true
 end
 
@@ -333,7 +372,7 @@ function Tetris.gameOver()
         greyline = Tetris.height-1
         _updateScore(0, 0)
 
-        if Tetris.running == true then
+        if Tetris.running == true and not SCENE_MANAGER:IsShowing("gameMenuInGame") then
             _hideMessagePopup(false)
             Tetris.PV:show()
             _createBlock()
@@ -351,63 +390,6 @@ function Tetris.gameOver()
     greyline = greyline - 1
 
     EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "gameover", 150, Tetris.gameOver)
-end
-
-
--- lockDown timeout to allow one more manipulation after slam
-slamed = false
-local function _lockDown()
-    EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "lockDown")
-    slamed = false
-    Tetris.tick()
-end
-
-
--- Manipulate active Block (left,right,rotate,slam)
-local function _manipulate(manipulation)
-    if Tetris.running == false then
-        return false
-    end
-
-    result = true
-    if manipulation == Tetris.manipulations.slam then
-        EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
-
-        while _checkMoves() and result do
-            result = _execManipulation(Tetris.manipulations.down)
-        end
-
-        if not slamed then
-            -- lockDown timeout to allow one more manipulation after slam
-            EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "lockDown", 500, _lockDown)
-            slamed = true
-        else
-            _lockDown()
-        end
-
-    elseif manipulation == Tetris.manipulations.down then
-        result = _execManipulation(manipulation)
-
-    elseif manipulation == Tetris.manipulations.left and maxManipulations.left > 0 then
-        maxManipulations.left = maxManipulations.left - 1
-        result = _execManipulation(manipulation)
-
-    elseif manipulation == Tetris.manipulations.right and maxManipulations.right > 0 then
-        maxManipulations.right = maxManipulations.right - 1
-        result = _execManipulation(manipulation)
-
-    elseif manipulation == Tetris.manipulations.rotate and maxManipulations.rotate > 0 then
-        maxManipulations.rotate = maxManipulations.rotate - 1
-        result = _execManipulation(manipulation)
-
-    elseif manipulation == Tetris.manipulations.rotatecounter and maxManipulations.rotate > 0 then
-        maxManipulations.rotate = maxManipulations.rotate - 1
-        result = _execManipulation(manipulation)
-    end
-
-    _drawUI()
-
-    return result
 end
 
 
@@ -446,23 +428,91 @@ local function _removeLines()
 end
 
 
+-- lockDown timeout to allow one more manipulation after slam
+willLockSoon = false
+local function _lockDown()
+    EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "lockDown")
+    willLockSoon = false
+
+
+    if not _isFreeBelow() then
+        _removeLines()
+        _createBlock()
+    end
+
+    Tetris.tick()
+end
+
+
+local function _locking()
+    if not willLockSoon then
+        -- lockDown timeout to allow one more manipulation after slam
+        EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "lockDown", 500, _lockDown)
+        willLockSoon = true
+    else
+        _lockDown()
+    end
+end
+
+
+-- Manipulate active Block (left,right,rotate,slam)
+local function _manipulate(manipulation)
+    if Tetris.running == false then
+        return false
+    end
+
+    result = true
+    if manipulation == Tetris.manipulations.slam then
+        EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
+
+        while _isFreeBelow() and result do
+            result = _execManipulation(Tetris.manipulations.down)
+        end
+
+        _locking()
+
+    elseif manipulation == Tetris.manipulations.down then
+        result = _execManipulation(manipulation)
+
+    elseif manipulation == Tetris.manipulations.left and maxManipulations.left > 0 then
+        maxManipulations.left = maxManipulations.left - 1
+        result = _execManipulation(manipulation)
+
+    elseif manipulation == Tetris.manipulations.right and maxManipulations.right > 0 then
+        maxManipulations.right = maxManipulations.right - 1
+        result = _execManipulation(manipulation)
+
+    elseif manipulation == Tetris.manipulations.rotate and maxManipulations.rotate > 0 then
+        maxManipulations.rotate = maxManipulations.rotate - 1
+        result = _execManipulation(manipulation)
+
+    elseif manipulation == Tetris.manipulations.rotatecounter and maxManipulations.rotate > 0 then
+        maxManipulations.rotate = maxManipulations.rotate - 1
+        result = _execManipulation(manipulation)
+    end
+
+    if willLockSoon and _isFreeBelow() then
+        _locking()
+    end
+
+    _drawUI()
+
+    return result
+end
+
+
 -- execute move on key or after timeout
 function Tetris.tick()
     --unset timer
     EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
 
     -- no ticks in game menu
-    if SCENE_MANAGER:IsShowing("gameMenuInGame") == true then
+    if SCENE_MANAGER:IsShowing("gameMenuInGame") then
         return
     end
 
     if not _manipulate(Tetris.manipulations.down) then
-        EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "tilelocked", 500, function()
-            EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tilelocked")
-            _removeLines()
-            _createBlock()
-            Tetris.tick()
-        end)
+        _locking()
         return
     end
 
