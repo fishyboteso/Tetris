@@ -2,7 +2,7 @@ TetrisMoves = {
     name = "TetrisMoves"
 }
 
-local logger = LibDebugLogger(TetrisMoves.name)
+--local logger = LibDebugLogger(TetrisMoves.name)
 
 function TetrisMoves.start(typus)
     Block = {}
