@@ -555,17 +555,17 @@ function Tetris.toggle(fishingState)
             _hideMessagePopup(false)
     end
 
-    if fishingState == Tetris.engine.state.reelin and Tetrisparams.blink == true then
+    if fishingState == FishingStateMachine.state.reelin and Tetrisparams.blink == true then
         _backgroundBlink()
     else
         EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "reelinBlink")
         Tetris.UI.background:SetColor(0, 0, 0, 1)
     end
 
-    -- Tetris.engine states that start Tetris
+    -- FishingStateMachine states that start Tetris
     if SCENE_MANAGER:IsShowing("hud")
-        and (((fishingState == Tetris.engine.state.looking or fishingState == Tetris.engine.state.reelin) and not Tetrisparams.lookingPause)
-        or fishingState == Tetris.engine.state.fishing)
+        and (((fishingState == FishingStateMachine.state.looking or fishingState == FishingStateMachine.state.reelin) and not Tetrisparams.lookingPause)
+        or fishingState == FishingStateMachine.state.fishing)
     then
         if Tetris.running == false then
             HUD_SCENE:AddFragment(Tetris.fragment)
@@ -576,9 +576,9 @@ function Tetris.toggle(fishingState)
             EVENT_MANAGER:RegisterForUpdate(Tetris.name .. "tick", Tetrisparams.timeout, Tetris.tick)
         end
 
-    -- Tetris.engine states that pause Tetris
-    elseif fishingState == Tetris.engine.state.loot or
-           ((fishingState == Tetris.engine.state.reelin or fishingState == Tetris.engine.state.looking) and Tetrisparams.lookingPause) then
+    -- FishingStateMachine states that pause Tetris
+    elseif fishingState == FishingStateMachine.state.loot or
+           ((fishingState == FishingStateMachine.state.reelin or fishingState == FishingStateMachine.state.looking) and Tetrisparams.lookingPause) then
         EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
 
         if Tetrisparams.showStats == true then
@@ -589,7 +589,7 @@ function Tetris.toggle(fishingState)
         HUD_SCENE:AddFragment(Tetris.fragment)
         Tetris.PV:hide()
 
-    --All other Tetris.engine states stop and hide Tetris
+    --All other FishingStateMachine states stop and hide Tetris
     else
         EVENT_MANAGER:UnregisterForUpdate(Tetris.name .. "tick")
         Tetris.running = false
@@ -601,9 +601,9 @@ end
 
 local function _toggleWrapper(oldState, newState)
     if newState == SCENE_HIDDEN then
-        Tetris.toggle(Tetris.engine.state.idle)
+        Tetris.toggle(FishingStateMachine.state.idle)
     elseif newState == SCENE_SHOWN then
-        Tetris.toggle(Tetris.engine:getCurrentState())
+        Tetris.toggle(FishingStateMachine:getState())
     end
 end
 
@@ -884,10 +884,8 @@ function Tetris.OnAddOnLoaded(event, addonName)
         -- init state
         Tetris.running = false
 
-        -- connect to Tetris.engine
-        TetrisChaInit()
-        Tetris.engine = TetrisCha
-        Tetris.engine.CallbackManager:RegisterCallback(Tetris.engine.name .. "TetrisCha_STATE_CHANGE", Tetris.toggle)
+        -- connect to FishingStateMachine
+        FishingStateMachine:registerOnStateChange(Tetris.toggle)
         HUD_SCENE:RegisterCallback("StateChange", _toggleWrapper)
 
     end

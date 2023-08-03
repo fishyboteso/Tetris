@@ -4,13 +4,12 @@
 ## APIVersion: 101036 101037
 ## Version: 1.5
 ## AddOnVersion: 15
-## DependsOn: LibAddonMenu-2.0>=30
+## DependsOn: LibAddonMenu-2.0>=30 FishingStateMachine>=110
 ## OptionalDependsOn: LibDebugLogger>=180
 ## SavedVariables: Tetrisparamsvar
 
 ## This Add-On is not created by, affiliated with or sponsored by ZeniMax Media Inc. or its affiliates. The Elder Scrolls® and related logos are registered trademarks or trademarks of ZeniMax Media Inc. in the United States and/or other countries. All rights reserved.
 
-TetrisCha.lua
 Moves.lua
 Preview.lua
 Bindings.xml
