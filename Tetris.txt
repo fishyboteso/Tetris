@@ -1,9 +1,9 @@
 ## Title: Tetris
-## Description: Play Tetris while fishing. |c0000C0Version: 1.5|r
+## Description: Play Tetris while fishing. |c0000C0Version: 1.6|r
 ## Author: |c0000C0Sem|r
-## APIVersion: 101036 101037
-## Version: 1.5
-## AddOnVersion: 15
+## APIVersion: 101038 101039
+## Version: 1.6
+## AddOnVersion: 16
 ## DependsOn: LibAddonMenu-2.0>=30 FishingStateMachine>=110
 ## OptionalDependsOn: LibDebugLogger>=180
 ## SavedVariables: Tetrisparamsvar
