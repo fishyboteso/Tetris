@@ -63,23 +63,6 @@ local blink = 1
 local tmpFishingState = 0
 local tmpInteractableName = ""
 
--- Copy a nested table
--- http://lua-users.org/wiki/CopyTable
-function deepcopy(orig)
-    local orig_type = type(orig)
-    local copy
-    if orig_type == 'table' then
-        copy = {}
-        for orig_key, orig_value in next, orig, nil do
-            copy[deepcopy(orig_key)] = deepcopy(orig_value)
-        end
-        setmetatable(copy, deepcopy(getmetatable(orig)))
-    else -- number, string, boolean, etc
-        copy = orig
-    end
-    return copy
-end
-
 
 -- update score for menu
 local function _updateScore(ls, bs)
@@ -104,7 +87,7 @@ end
 
 -- Executes Manipulation on pixel array if possible
 local function _execManipulation(manipulation)
-    tempBlock = deepcopy(Tetris.Block)
+    tempBlock = ZO_DeepTableCopy(Tetris.Block, tempBlock)
 
     -- unset old position
     _setBlockToArray(Tetris.blocks.none)
@@ -125,8 +108,8 @@ local function _execManipulation(manipulation)
     --bottom
     if Tetris.Block.a.y >= Tetris.height or Tetris.Block.b.y >= Tetris.height or
        Tetris.Block.c.y >= Tetris.height or Tetris.Block.d.y >= Tetris.height then
-        Tetris.Block = deepcopy(tempBlock)
-        Tetrisparams.Block = deepcopy(Tetris.Block)
+        Tetris.Block = ZO_DeepTableCopy(tempBlock, Tetris.Block)
+        Tetrisparams.Block = ZO_DeepTableCopy(Tetris.Block, Tetrisparams.Block)
 
         _setBlockToArray(Tetris.Block.typus)
         return false
@@ -134,8 +117,8 @@ local function _execManipulation(manipulation)
     --left border
     if Tetris.Block.a.x < 0 or Tetris.Block.b.x < 0 or
        Tetris.Block.c.x < 0 or Tetris.Block.d.x < 0 then
-        Tetris.Block = deepcopy(tempBlock)
-        Tetrisparams.Block = deepcopy(Tetris.Block)
+        Tetris.Block = ZO_DeepTableCopy(tempBlock, Tetris.Block)
+        Tetrisparams.Block = ZO_DeepTableCopy(Tetris.Block, Tetrisparams.Block)
 
         _setBlockToArray(Tetris.Block.typus)
         return false
@@ -143,8 +126,8 @@ local function _execManipulation(manipulation)
     --right border
     if Tetris.Block.a.x >= Tetris.width or Tetris.Block.b.x >= Tetris.width or
        Tetris.Block.c.x >= Tetris.width or Tetris.Block.d.x >= Tetris.width then
-        Tetris.Block = deepcopy(tempBlock)
-        Tetrisparams.Block = deepcopy(Tetris.Block)
+        Tetris.Block = ZO_DeepTableCopy(tempBlock, Tetris.Block)
+        Tetrisparams.Block = ZO_DeepTableCopy(Tetris.Block, Tetrisparams.Block)
 
         _setBlockToArray(Tetris.Block.typus)
         return false
@@ -155,15 +138,15 @@ local function _execManipulation(manipulation)
     or Tetris.array[Tetris.Block.b.x][Tetris.Block.b.y] and Tetris.array[Tetris.Block.b.x][Tetris.Block.b.y] > Tetris.blocks.none
     or Tetris.array[Tetris.Block.c.x][Tetris.Block.c.y] and Tetris.array[Tetris.Block.c.x][Tetris.Block.c.y] > Tetris.blocks.none
     or Tetris.array[Tetris.Block.d.x][Tetris.Block.d.y] and Tetris.array[Tetris.Block.d.x][Tetris.Block.d.y] > Tetris.blocks.none then
-        Tetris.Block = deepcopy(tempBlock)
-        Tetrisparams.Block = deepcopy(Tetris.Block)
+        Tetris.Block = ZO_DeepTableCopy(tempBlock, Tetris.Block)
+        Tetrisparams.Block = ZO_DeepTableCopy(Tetris.Block, Tetrisparams.Block)
 
         _setBlockToArray(Tetris.Block.typus)
         return false
     end
 
     -- set new position
-    Tetrisparams.Block = deepcopy(Tetris.Block)
+    Tetrisparams.Block = ZO_DeepTableCopy(Tetris.Block, Tetrisparams.Block)
     _setBlockToArray(Tetris.Block.typus)
     return true
 end
@@ -193,7 +176,7 @@ local function _drawPixel(source, target, w, h, bg)
             bg:SetColor(0,0,0,1)
         end
     end
-    Tetrisparams.array = deepcopy(Tetris.array)
+    Tetrisparams.array = ZO_DeepTableCopy(Tetris.array, Tetrisparams.array)
 end
 
 
@@ -302,7 +285,7 @@ local function _createBlock()
     -- get the Block start layout from  Moves.lua
     typus = _getNextBlock()
     Tetris.Block = TetrisMoves.start(typus)
-    Tetrisparams.Block = deepcopy(Tetris.Block)
+    Tetrisparams.Block = ZO_DeepTableCopy(Tetris.Block, Tetrisparams.Block)
 
     -- check for "game over"
     if not _isFreeBelow() then
@@ -870,10 +853,10 @@ function Tetris.OnAddOnLoaded(event, addonName)
 
         -- reinit last game from savedvar
         if Tetrisparams.array then
-            Tetris.array = deepcopy(Tetrisparams.array)
+            Tetris.array = ZO_DeepTableCopy(Tetrisparams.array, Tetris.array)
         end
         if Tetrisparams.Block then
-            Tetris.Block = deepcopy(Tetrisparams.Block)
+            Tetris.Block = ZO_DeepTableCopy(Tetrisparams.Block, Tetris.Block)
         end
         if not Tetris.Block.typus then
             _createBlock()
