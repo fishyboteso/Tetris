@@ -2,20 +2,18 @@
   
 **Play Tetris while you are playing a fishing-minigame while you are playing Elderscrolls Online**  
   
-It can integrate state machines from [fishyboteso/FishyQR](https://github.com/fishyboteso/FishyQR) or [fishyboteso/Chalutier](https://github.com/fishyboteso/Chalutier) for brilliant extra features.
-  
 ## Installation:
 ### With Minion:
 - Download [Tetris for Fishing](https://www.esoui.com/downloads/info3314-TetrisforFishing.html)
 - Depends on [LibAddonMenu](https://www.esoui.com/downloads/info7-LibAddonMenu.html)
-- Optionally depends on [Chalutier](https://www.esoui.com/downloads/info2934-Chalutier.html)
+- Depends on [FishingStateMachine](https://www.esoui.com/downloads/info3693-FishingStateMachine.html)
 - Set up **keybindings** for Tetris in the game
 
 ### By Hand:
 - Download the latest release of [Tetris.zip](https://github.com/fishyboteso/Tetris/releases)
 - Download [LibAddonMenu-2](https://www.esoui.com/downloads/info7-LibAddonMenu.html)
-- Optionally download [Chalutier](https://www.esoui.com/downloads/info2934-Chalutier.html) for brilliant extra features
-- Unpack the ZIP to ESOs AddOns folder: "C:\Users< username >\Documents\Elder Scrolls Online\live\AddOns"
+- Download [FishingStateMachine](https://www.esoui.com/downloads/info3693-FishingStateMachine.html)
+- Unpack the ZIP to ESOs AddOns folder: "C:\Users\\< username >\Documents\Elder Scrolls Online\live\AddOns"
 - Set up **keybindings** for Tetris in the game
   
 ## Tetris UI
@@ -31,7 +29,7 @@ It can integrate state machines from [fishyboteso/FishyQR](https://github.com/fi
 ## Showcase on Youtube
 [![Play Tetris while fishing in Elderscrolls Online](https://img.youtube.com/vi/Qh1E58Fy0AQ/0.jpg)]( https://www.youtube.com/watch?v=Qh1E58Fy0AQ)
 
-### Open for 1.6:
+### Open Features:
 - Optional increase speed
 - Implement Guidelines:
   - rename blocks -> tetrominos/pieces
@@ -42,6 +40,13 @@ It can integrate state machines from [fishyboteso/FishyQR](https://github.com/fi
 - Fix random game over bug
   
 ### Changelog:
+**1.7**
+- update API version to 101040
+- use ZO_tabledeepcopy for deepcopy
+
+**1.6**
+- use FishingStateMachine addon
+
 **1.5:**
 - fix game over bugs
 - lock down time 500 ms
